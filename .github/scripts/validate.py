@@ -162,6 +162,13 @@ def check_plugin(plugin_dir: Path) -> str | None:
     if plugin_license != expected_license:
         err(manifest_path, f"plugin.json license={plugin_license!r}; expected {expected_license!r}")
 
+    # Every plugin in this marketplace is commercial; the sibling
+    # helmguild-plugins-public repo holds non-commercial community
+    # plugins. The flag is mirrored on the marketplace.json entry
+    # for catalogue-time visibility.
+    if manifest.get("commercial") is not True:
+        err(manifest_path, "plugin.json `commercial: true` required in the helmguild-plugins (private) marketplace")
+
     # Every bundled script (under scripts/ or mcp-server/) must have a
     # matching test under tests/test-<dir>-<stem>.{sh,mjs}. Catches the
     # class of regression where a plugin ships a helper with no proof
@@ -206,6 +213,16 @@ def main() -> int:
         err(MARKETPLACE, "`name` missing")
     if not marketplace.get("owner"):
         err(MARKETPLACE, "`owner` missing")
+    # This is the PRIVATE / commercial marketplace. The metadata block
+    # must declare both, and every plugin entry must mirror the flag.
+    md = marketplace.get("metadata") or {}
+    if md.get("commercial") is not True:
+        err(MARKETPLACE, "`metadata.commercial: true` required in this private marketplace")
+    if md.get("distribution") != "private":
+        err(MARKETPLACE, "`metadata.distribution: \"private\"` required in this marketplace")
+    for p in marketplace.get("plugins", []) or []:
+        if isinstance(p, dict) and p.get("commercial") is not True:
+            err(MARKETPLACE, f"plugin entry {p.get('name')!r} missing `commercial: true`")
     listed_plugins = {p["name"] for p in marketplace.get("plugins", []) if isinstance(p, dict) and p.get("name")}
 
     discovered: set[str] = set()

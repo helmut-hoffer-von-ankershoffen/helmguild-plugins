@@ -8,6 +8,8 @@ The **private** marketplace of plugins that helmguild's mentors publish for thei
 
 The plugins themselves never leave this repo + the `mcp.helmguild.com/ammp` server. Mentees install through AMMP `GetPluginArchive` — they receive a Bearer-gated zip URL, download it, and the user runs `/plugin install <extracted>` in their runtime. **Do not** publish anywhere else.
 
+This marketplace is the **commercial** side. The validator enforces `metadata.commercial: true` + `metadata.distribution: "private"` on `marketplace.json`, plus `"commercial": true` on every `plugin.json` and every marketplace plugin entry. Community-licensed (non-commercial) plugins go in the sibling [`helmguild-plugins-public`](https://github.com/helmut-hoffer-von-ankershoffen/helmguild-plugins-public) repo, which mirrors the same shape but enforces `commercial: false` + OSI-approved licenses.
+
 - Marketplace catalogue: `.claude-plugin/marketplace.json`
 - License (everything): `LicenseRef-helmguild-mentoring-1.0` — see [`LICENSE.md`](LICENSE.md).
 - Reference AMMP server: <https://github.com/helmut-hoffer-von-ankershoffen/ammp-mcp>

@@ -7,9 +7,11 @@
     "email": "helmuthva@gmail.com"
   },
   "metadata": {
-    "version": "0.1.0",
+    "version": "1.0.0",
     "homepage": "https://www.helmguild.com/",
-    "license": "LicenseRef-helmguild-mentoring-1.0"
+    "license": "LicenseRef-helmguild-mentoring-1.0",
+    "commercial": true,
+    "distribution": "private"
   },
   "plugins": [
     {
@@ -28,7 +30,8 @@
         "ammp",
         "mentoring",
         "pepe-arturo"
-      ]
+      ],
+      "commercial": true
     },
     {
       "name": "pepe-operator-craft",
@@ -46,7 +49,8 @@
         "ammp",
         "mentoring",
         "pepe-arturo"
-      ]
+      ],
+      "commercial": true
     },
     {
       "name": "pepe-personal-assistant-for-managers",
@@ -64,7 +68,8 @@
         "ammp",
         "mentoring",
         "pepe-arturo"
-      ]
+      ],
+      "commercial": true
     }
   ]
 }
