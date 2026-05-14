@@ -49,6 +49,8 @@ Each command is a discrete procedure the agent runs. The first command runs **on
 
 7. **Verify quota.** Veo has a tight per-minute quota (≈ 1 long-running operation in flight at a time on the free tier; preview quota varies). The agent runs Command 2 with a one-line "test render" prompt and checks that the operation completes within ~3 min. If 429s persist, the operator must request a quota bump from the Veo product page or upgrade billing.
 
+8. **Run the doctor to confirm.** The agent calls `scripts/setup-doctor.sh --channel veo` (or the bundled MCP equivalent). Exit 0 + `✓ veo ready` means the API key is valid and `veo-3.1-generate-preview` is enrolled on the account. Any other status → return to the step the doctor reports as the gap.
+
 The operator confirms once: "Setup complete." From this point on the agent runs the remaining commands autonomously.
 
 ### Command 2 — Generate the character reference sheet

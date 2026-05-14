@@ -31,9 +31,12 @@ The plugin ships:
 
 * **MCP server** (`mcp-server/pipeline-status.mjs`) — exposes two tools: `pipeline_state` (current queue depths, recent transitions, stuck pieces, quota burn) and `pipeline_channels` (per-channel publish counts + success rate over a rolling window). Wired into the plugin's `.mcp.json`.
 * **Scripts** (`scripts/`) — operator-runnable helpers:
+  * `setup-doctor.sh` — probe each channel's credentials + API surface and report per-channel readiness (`ready` / `partial` / `missing` / `error` / `skipped-offline`). The "did I do Setup correctly?" check. Run after completing each skill's Command 1 — exits 0 only when every probed channel is `ready`. Supports `--channel <name>`, `--json`, and `--offline`.
   * `inspect-content-state.sh` — read-only dump of `$PEPE_PIPELINE_STATE_DIR` (queue + audit log).
   * `instagram-caption-lint.sh` — caption linter (length, hook, hashtag count, emoji signature, banned phrases).
   * `veo-prompt-skeleton.sh` — render a Veo 3.1 prompt skeleton from a one-line brief.
+  * `x-tweet-lint.sh` — X-post linter (length, hashtag count, emoji signature, banned phrases, placeholder detection).
+  * `blog-post-scaffold.sh` — scaffold a new blog post at the operator's canonical post-layout path (HTML + Markdown mirror, frontmatter, canonical link, og tags, hreflang-friendly).
 * **Tests** (`tests/`) — `node --test` for the MCP server, `bash`-based test harness for every script. Run with `bash tests/run-all.sh` (or via the marketplace's `validate.yml` CI job).
 
 ## Operator setup checklist (in order)

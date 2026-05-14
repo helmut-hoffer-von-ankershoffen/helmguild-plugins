@@ -51,6 +51,8 @@ This skill is opinionated toward a **static-site, Git-backed, CDN-deployed** sta
     * **Domain-per-locale convention:** `<brand>.com` for primary, `<brand>.de` etc. — heavier infrastructure, only worth it for SEO-aggressive multi-market brands.
 12. **Smoke-test with a placeholder post.** Run Command 2 with a draft slug `hello-world` → push to a feature branch → preview URL renders → merge → live URL renders within 30 s of merge → sitemap.xml lists the post → Atom feed includes it.
 
+13. **Run the doctor to confirm.** Persist `BLOG_ROOT` (path to the site repo) + `BLOG_PUBLIC_URL` (the live URL) in `~/.openclaw/credentials/blog/env`, then run `scripts/setup-doctor.sh --channel blog`. Exit 0 + `✓ blog ready — https://<brand>.com reachable` means the repo exists locally + the live URL responds 2xx. Anything else → return to the step the doctor reports as the gap.
+
 Operator confirms: "Setup complete."
 
 ### Command 2 — Author a post

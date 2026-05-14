@@ -57,6 +57,8 @@ This is the only skill in the playbook that talks to the operator in **planning*
    * Any piece touching a sensitive topic flagged in the brand voice rules → gated.
    * Routine pieces in an established arc → auto-schedule.
 
+8. **Run the full doctor.** Once arcs, canonical store, and per-channel Setup are all done, run `scripts/setup-doctor.sh` (no `--channel` flag — probes all five). Exit 0 + `✓` on every line = the pipeline is fully wired and Commands 2-7 below can run without operator intervention. The doctor's JSON mode (`--json`) is what the bundled MCP `pipeline-state` tool surfaces to a mentee agent on first connect.
+
 Operator confirms: "Setup complete."
 
 ### Command 2 — Plan the next 7-14 days

@@ -68,6 +68,8 @@ This skill assumes the upstream `virtual-character-veo-3-1` (or any other produc
 12. **Define per-account voice rules.** The agent prompts the operator for the caption style: tone, language, hashtag policy, emoji signature, banned phrases. Persist as `~/.openclaw/credentials/instagram/voice-rules.json`. The example schema and the Pepe reference values are in `## Brand-specific overrides`.
 13. **Smoke-test.** Run Command 2 with a 5-second placeholder reel and a draft caption. The first publish defaults to `IG_FIRST_PUBLISH_GATE=1`, which holds the post in `published: false` state on IG until the operator manually publishes from the IG app. Once you've seen one successful API → IG → app round-trip, set `IG_FIRST_PUBLISH_GATE=0` for normal operation.
 
+14. **Run the doctor to confirm.** `scripts/setup-doctor.sh --channel instagram`. Exit 0 + `✓ instagram ready — IG account @<handle> reachable` means the page token resolves the IG user ID over the Graph API. Anything else → return to the step the doctor names.
+
 Operator confirms: "Setup complete." From this point on the agent runs the remaining commands without operator intervention except where explicitly noted.
 
 ### Command 2 — Post a reel

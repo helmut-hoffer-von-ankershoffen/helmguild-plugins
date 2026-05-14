@@ -70,6 +70,8 @@ Compared to Instagram, X is simpler: no business-account-linked-to-page plumbing
 9. **Define per-account voice rules.** Same shape as `publishing-instagram` Command 1.12 but tuned to X's 280-char limit + thread norms: tone, language, hashtag policy (typically lighter on X — 1-3 hashtags vs IG's 10), emoji signature, banned phrases. Persist as `~/.openclaw/credentials/x/voice-rules.json`.
 10. **Smoke-test.** Run Command 2 with a draft text-only post. Verify the first publish lands as drafted. `X_FIRST_PUBLISH_GATE=1` holds the post as a draft (saved-but-not-tweeted) until the operator confirms — set to `0` after the first round-trip.
 
+11. **Run the doctor to confirm.** `scripts/setup-doctor.sh --channel x`. Exit 0 + `✓ x ready — OAuth 2.0 refresh-token chain valid` means the refresh exchange succeeded; the doctor cached the result for 60 s so re-runs don't burn the OAuth-refresh budget. Anything else → return to the step the doctor reports as the gap.
+
 Operator confirms: "Setup complete."
 
 ### Command 2 — Refresh the access token (run at the start of every batch)
