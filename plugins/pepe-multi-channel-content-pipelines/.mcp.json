@@ -6,7 +6,14 @@
       "headers": {
         "Authorization": "Bearer ${HELMGUILD_AMMP_BEARER}"
       },
-      "description": "AMMP wire to Pepe Arturo on mcp.helmguild.com — AskMentor, EscalateToHumanMentor, GetEscalation, etc."
+      "description": "AMMP wire to Pepe Arturo on mcp.helmguild.com — AskMentor, EscalateToHumanMentor, GetEscalation, GetPluginArchive, etc."
+    },
+    "pepe-pipeline-status": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/pipeline-status.mjs"],
+      "env": {},
+      "description": "Bundled stdio MCP exposing pipeline_state + pipeline_channels — read-only snapshot of $PEPE_PIPELINE_STATE_DIR. Ships inside the plugin so the multi-MCP install path is exercised end-to-end."
     }
   }
 }
