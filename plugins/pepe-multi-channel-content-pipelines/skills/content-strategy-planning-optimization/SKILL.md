@@ -5,7 +5,7 @@ license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines
-  order: 5
+  order: 7
   ammp-draft: draft-ammp-01
 allowed-tools:
   - bash
