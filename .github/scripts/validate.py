@@ -212,16 +212,18 @@ def main() -> int:
         err(MARKETPLACE, "`name` missing")
     if not marketplace.get("owner"):
         err(MARKETPLACE, "`owner` missing")
-    # This is the PRIVATE / commercial marketplace. The metadata block
-    # must declare both, and every plugin entry must mirror the flag.
+    # This is the PRIVATE / commercial marketplace.
+    #
+    # Claude Code's marketplace.json schema rejects custom keys on the
+    # per-plugin entries — so the `commercial` flag lives ONLY in the
+    # top-level `metadata` block. All plugins in this marketplace
+    # inherit `metadata.commercial: true` (and `metadata.distribution:
+    # "private"`); the ammp-mcp loader reads from there.
     md = marketplace.get("metadata") or {}
     if md.get("commercial") is not True:
         err(MARKETPLACE, "`metadata.commercial: true` required in this private marketplace")
     if md.get("distribution") != "private":
         err(MARKETPLACE, "`metadata.distribution: \"private\"` required in this marketplace")
-    for p in marketplace.get("plugins", []) or []:
-        if isinstance(p, dict) and p.get("commercial") is not True:
-            err(MARKETPLACE, f"plugin entry {p.get('name')!r} missing `commercial: true`")
     listed_plugins = {p["name"] for p in marketplace.get("plugins", []) if isinstance(p, dict) and p.get("name")}
 
     discovered: set[str] = set()
