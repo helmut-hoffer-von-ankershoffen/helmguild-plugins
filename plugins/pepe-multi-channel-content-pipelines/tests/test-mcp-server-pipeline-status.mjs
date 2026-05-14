@@ -46,7 +46,7 @@ async function rpc(requests, { env = {} } = {}) {
   return lines;
 }
 
-test("initialize → tools/list returns the two expected tools", async () => {
+test("initialize → tools/list returns the three expected tools", async () => {
   const responses = await rpc([
     {
       jsonrpc: "2.0",
@@ -63,10 +63,10 @@ test("initialize → tools/list returns the two expected tools", async () => {
   const list = responses.find((r) => r.id === 2);
   assert.ok(list?.result, "tools/list must return a result");
   const names = list.result.tools.map((t) => t.name).sort();
-  assert.deepEqual(names, ["pipeline_channels", "pipeline_state"]);
+  assert.deepEqual(names, ["pipeline_channels", "pipeline_state", "setup_readiness"]);
 });
 
-test("pipeline_channels returns the static channel list", async () => {
+test("pipeline_channels returns the five-skill channel list", async () => {
   const responses = await rpc([
     {
       jsonrpc: "2.0",
@@ -81,7 +81,88 @@ test("pipeline_channels returns the static channel list", async () => {
   assert.ok(r?.result, "tools/call must return a result");
   const payload = JSON.parse(r.result.content[0].text);
   const ids = payload.map((c) => c.id).sort();
-  assert.deepEqual(ids, ["instagram", "website", "x", "youtube"]);
+  assert.deepEqual(ids, ["blog", "instagram", "strategy", "veo", "x"]);
+  // Each channel names the skill it backs — proves the MCP list stays in
+  // lockstep with the on-disk skills/ directory.
+  for (const c of payload) {
+    assert.ok(c.skill, `channel ${c.id} missing skill field`);
+    assert.ok(c.purpose, `channel ${c.id} missing purpose field`);
+  }
+});
+
+test("setup_readiness probes all channels and returns JSON", async () => {
+  // --offline so the test doesn't try to hit Google / Meta / X.
+  // Empty CREDENTIALS_ROOT → every channel reports `missing` cleanly.
+  const tmpCreds = mkdtempSync(join(tmpdir(), "doctor-creds-"));
+  const tmpState = mkdtempSync(join(tmpdir(), "doctor-state-"));
+  try {
+    const responses = await rpc(
+      [
+        {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "t", version: "0" } },
+        },
+        { jsonrpc: "2.0", method: "notifications/initialized" },
+        {
+          jsonrpc: "2.0",
+          id: 2,
+          method: "tools/call",
+          params: { name: "setup_readiness", arguments: { offline: true } },
+        },
+      ],
+      { env: { CREDENTIALS_ROOT: tmpCreds, PEPE_PIPELINE_STATE_DIR: tmpState } },
+    );
+    const r = responses.find((x) => x.id === 2);
+    assert.ok(r?.result, "setup_readiness must return a result");
+    const payload = JSON.parse(r.result.content[0].text);
+    // exit_code 1 because empty tree → not every channel `ready`.
+    assert.equal(payload.exit_code, 1);
+    assert.ok(Array.isArray(payload.channels));
+    const ids = payload.channels.map((c) => c.channel).sort();
+    assert.deepEqual(ids, ["blog", "instagram", "strategy", "veo", "x"]);
+    // Veo / Instagram / X / Blog all report `missing` against empty creds.
+    for (const ch of ["veo", "instagram", "x", "blog"]) {
+      const row = payload.channels.find((c) => c.channel === ch);
+      assert.equal(row.status, "missing", `${ch} should be missing`);
+    }
+  } finally {
+    rmSync(tmpCreds, { recursive: true, force: true });
+    rmSync(tmpState, { recursive: true, force: true });
+  }
+});
+
+test("setup_readiness with --channel narrows the probe", async () => {
+  const tmpCreds = mkdtempSync(join(tmpdir(), "doctor-creds-"));
+  const tmpState = mkdtempSync(join(tmpdir(), "doctor-state-"));
+  try {
+    const responses = await rpc(
+      [
+        {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "t", version: "0" } },
+        },
+        { jsonrpc: "2.0", method: "notifications/initialized" },
+        {
+          jsonrpc: "2.0",
+          id: 2,
+          method: "tools/call",
+          params: { name: "setup_readiness", arguments: { offline: true, channel: "veo" } },
+        },
+      ],
+      { env: { CREDENTIALS_ROOT: tmpCreds, PEPE_PIPELINE_STATE_DIR: tmpState } },
+    );
+    const r = responses.find((x) => x.id === 2);
+    const payload = JSON.parse(r.result.content[0].text);
+    assert.equal(payload.channels.length, 1);
+    assert.equal(payload.channels[0].channel, "veo");
+  } finally {
+    rmSync(tmpCreds, { recursive: true, force: true });
+    rmSync(tmpState, { recursive: true, force: true });
+  }
 });
 
 test("pipeline_state reports the configured dir + recently-touched files", async () => {

@@ -1,7 +1,7 @@
 {
   "name": "pepe-multi-channel-content-pipelines",
   "description": "Designing, running, and optimising autonomous multi-channel content pipelines: Veo character generation, Instagram reels, X cross-posting, blog publishing, and the editorial calendar that ties them together. Each skill has a setup command that walks the human operator through external dependencies (Google AI Studio, Meta Business, X Developer Platform, Cloudflare Pages) and multiple procedural commands the agent runs autonomously. Designed to fully replicate Pepe Arturo's content pipeline on any brand.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": {
     "name": "Helmut Hoffer von Ankershoffen",
     "email": "helmuthva@gmail.com"

@@ -22,20 +22,29 @@
 // State path is read from $PEPE_PIPELINE_STATE_DIR; nothing is written.
 
 import { readFile, readdir, stat } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { createInterface } from "node:readline";
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const PROTOCOL_VERSION = "2025-06-18";
 const SERVER_NAME = "pepe-pipeline-status";
-const SERVER_VERSION = "0.1.0";
+const SERVER_VERSION = "0.2.0";
 
+// Match the 5 skills in this plugin (each has its own Setup command;
+// the setup_readiness tool below probes each one's credentials).
 const CHANNELS = [
-  { id: "instagram", purpose: "Reels + grid posts; reach + lifestyle" },
-  { id: "x", purpose: "Threads + short takes; community" },
-  { id: "website", purpose: "Long-form essays + manifesto" },
-  { id: "youtube", purpose: "Long-form video + retention" },
+  { id: "veo", skill: "virtual-character-veo-3-1", purpose: "Generate consistent virtual characters as 8s 9:16 video + native audio." },
+  { id: "instagram", skill: "publishing-instagram", purpose: "Reels + Story mirror + collaborator invite via Meta Graph API." },
+  { id: "x", skill: "publishing-x", purpose: "Posts, threads, IG cross-posts via X API v2." },
+  { id: "blog", skill: "publishing-blog", purpose: "Long-form posts on a static-site brand domain via Git + Cloudflare Pages." },
+  { id: "strategy", skill: "content-strategy-planning-optimization", purpose: "Editorial calendar, batch sweeps, analytics, human gates." },
 ];
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const SETUP_DOCTOR_PATH = join(__dirname, "..", "scripts", "setup-doctor.sh");
 
 function stateDir() {
   return process.env.PEPE_PIPELINE_STATE_DIR || join(homedir(), ".openclaw", "state", "instagram-media");
@@ -91,7 +100,55 @@ const TOOLS = [
     description: "List the channels Pepe operates content pipelines for (static; no I/O).",
     inputSchema: { type: "object", properties: {} },
   },
+  {
+    name: "setup_readiness",
+    description:
+      "Per-channel readiness probe — wraps the bundled scripts/setup-doctor.sh and returns its JSON output. Reports `ready` / `partial` / `missing` / `error` / `skipped-offline` for each of the five channels (veo, instagram, x, blog, strategy). Use this on first connect to decide whether the operator's pipeline is wired up enough to run procedural commands, or whether to route them back to a Setup step.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        channel: {
+          type: "string",
+          enum: ["veo", "instagram", "x", "blog", "strategy"],
+          description: "Probe a single channel. Omit to probe all five.",
+        },
+        offline: {
+          type: "boolean",
+          description: "Skip network probes (CI-safe). Defaults to false.",
+          default: false,
+        },
+      },
+    },
+  },
 ];
+
+function runSetupDoctor(args) {
+  return new Promise((resolve) => {
+    const child = spawn("bash", [SETUP_DOCTOR_PATH, "--json", ...args], {
+      env: process.env,
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => (stdout += d.toString()));
+    child.stderr.on("data", (d) => (stderr += d.toString()));
+    child.on("close", (code) => {
+      // setup-doctor exits 0 only when every probed channel is ready;
+      // any other status (partial/missing/error) is exit 1. We still
+      // surface the JSON payload either way — the agent needs to see
+      // *which* channel isn't ready.
+      let parsed;
+      try {
+        parsed = JSON.parse(stdout);
+      } catch {
+        parsed = { error: "doctor produced non-JSON output", stdout, stderr, exit_code: code };
+      }
+      resolve({ exit_code: code, channels: parsed, stderr });
+    });
+    child.on("error", (e) => {
+      resolve({ exit_code: -1, error: String(e?.message || e) });
+    });
+  });
+}
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");
@@ -130,6 +187,14 @@ async function handle(req) {
         }
         if (name === "pipeline_channels") {
           reply(id, { content: [{ type: "text", text: JSON.stringify(CHANNELS, null, 2) }] });
+          return;
+        }
+        if (name === "setup_readiness") {
+          const cliArgs = [];
+          if (args.channel) cliArgs.push("--channel", args.channel);
+          if (args.offline) cliArgs.push("--offline");
+          const result = await runSetupDoctor(cliArgs);
+          reply(id, { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] });
           return;
         }
         replyError(id, -32601, `unknown tool: ${name}`);

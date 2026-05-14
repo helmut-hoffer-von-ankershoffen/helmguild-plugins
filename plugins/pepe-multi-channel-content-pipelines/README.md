@@ -29,7 +29,10 @@ The playbook is five skills: four channel-specific (generation + each publishing
 
 The plugin ships:
 
-* **MCP server** (`mcp-server/pipeline-status.mjs`) — exposes two tools: `pipeline_state` (current queue depths, recent transitions, stuck pieces, quota burn) and `pipeline_channels` (per-channel publish counts + success rate over a rolling window). Wired into the plugin's `.mcp.json`.
+* **MCP server** (`mcp-server/pipeline-status.mjs`) — exposes three tools wired into the plugin's `.mcp.json`:
+  * `pipeline_state` — snapshot of the configured pipeline-state directory (filenames + sizes, no contents).
+  * `pipeline_channels` — list of the five channels this plugin operates (each names the skill it backs).
+  * `setup_readiness` — per-channel readiness probe (wraps `scripts/setup-doctor.sh --json`). On first connect, a mentee agent calls this to decide whether the operator's pipeline is wired up enough to run procedural commands, or whether to route the request back to a Setup step.
 * **Scripts** (`scripts/`) — operator-runnable helpers:
   * `setup-doctor.sh` — probe each channel's credentials + API surface and report per-channel readiness (`ready` / `partial` / `missing` / `error` / `skipped-offline`). The "did I do Setup correctly?" check. Run after completing each skill's Command 1 — exits 0 only when every probed channel is `ready`. Supports `--channel <name>`, `--json`, and `--offline`.
   * `inspect-content-state.sh` — read-only dump of `$PEPE_PIPELINE_STATE_DIR` (queue + audit log).
