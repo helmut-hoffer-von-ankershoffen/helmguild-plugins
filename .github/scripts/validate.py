@@ -160,7 +160,32 @@ def check_plugin(plugin_dir: Path) -> str | None:
     expected_license = "LicenseRef-helmguild-mentoring-1.0"
     plugin_license = manifest.get("license")
     if plugin_license != expected_license:
-        err(plugin_json, f"plugin.json license={plugin_license!r}; expected {expected_license!r}")
+        err(manifest_path, f"plugin.json license={plugin_license!r}; expected {expected_license!r}")
+
+    # Every bundled script (under scripts/ or mcp-server/) must have a
+    # matching test under tests/test-<dir>-<stem>.{sh,mjs}. Catches the
+    # class of regression where a plugin ships a helper with no proof
+    # it works. (Helmut, 2026-05-14.)
+    for src_dir, expected_ext in (("scripts", ".sh"), ("mcp-server", ".mjs")):
+        dir_path = plugin_dir / src_dir
+        if not dir_path.is_dir():
+            continue
+        for script in sorted(dir_path.iterdir()):
+            if not script.is_file() or not script.suffix == expected_ext:
+                continue
+            test_ext = ".sh" if expected_ext == ".sh" else ".mjs"
+            test_path = plugin_dir / "tests" / f"test-{src_dir}-{script.stem}{test_ext}"
+            if not test_path.is_file():
+                err(
+                    script,
+                    f"bundled script has no matching test (expected {test_path.relative_to(plugin_dir)})",
+                )
+                continue
+            # Tests must be executable so the CI runner can spawn them
+            # without an extra `chmod +x` step.
+            mode = test_path.stat().st_mode
+            if not (mode & 0o100):
+                err(test_path, "test must be executable (chmod +x)")
 
     return name
 

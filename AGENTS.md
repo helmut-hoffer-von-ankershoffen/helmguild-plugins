@@ -48,8 +48,36 @@ helmguild-plugins/
 5. A plugin folder is missing `LICENSE.md`.
 6. A `SKILL.md` has invalid frontmatter (missing `name`, wrong `name`, missing/oversize `description`, duplicate `metadata.order` within the same plugin).
 7. A plugin's `.mcp.json` exists but doesn't parse.
+8. **A bundled script under `scripts/` or `mcp-server/` is missing a matching test at `tests/test-<dir>-<stem>.{sh,mjs}`, or the test isn't executable.** Scripts ship with proof they work; the test-bundled-scripts CI job actually runs them on every push.
 
 Run locally before pushing: `python3 .github/scripts/validate.py`.
+
+## Tests for bundled scripts (required)
+
+**Every script bundled in a plugin ships with a test.** No exceptions. The test lives at:
+
+```
+plugins/<plugin>/tests/test-<source-dir>-<stem>.<ext>
+```
+
+| Bundled artefact                                      | Test file                                              | Runner       |
+| ----------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `plugins/<p>/scripts/foo.sh`                          | `plugins/<p>/tests/test-scripts-foo.sh`                | `bash`       |
+| `plugins/<p>/mcp-server/foo.mjs`                      | `plugins/<p>/tests/test-mcp-server-foo.mjs`            | `node --test` |
+
+Pattern for the `.mjs` tests: spawn the MCP over stdin/stdout, run the JSON-RPC handshake (`initialize` → `notifications/initialized` → `tools/list` → `tools/call`), assert response shapes. Pure Node stdlib + `node:test`; zero dependencies. See `plugins/pepe-multi-channel-content-pipelines/tests/test-mcp-server-pipeline-status.mjs` for the reference.
+
+Pattern for the `.sh` tests: `set -euo pipefail`, run the helper with crafted env / args under `mktemp -d`, assert exit codes + grep stdout. See `plugins/pepe-multi-channel-content-pipelines/tests/test-scripts-inspect-content-state.sh`.
+
+The CI workflow runs every `tests/*.{mjs,sh}` on every push and fails on any non-zero exit. The validator also asserts the test files exist + are executable, so a "scripts but no tests" PR fails fast even before the test runner spins up.
+
+Run locally before pushing:
+
+```sh
+# from the plugin root
+node --test tests/test-mcp-server-pipeline-status.mjs
+bash tests/test-scripts-inspect-content-state.sh
+```
 
 ## Editing a skill
 

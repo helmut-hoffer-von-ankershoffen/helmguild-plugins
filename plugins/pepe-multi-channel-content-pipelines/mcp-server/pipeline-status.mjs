@@ -148,7 +148,11 @@ async function handle(req) {
 
 async function main() {
   const rl = createInterface({ input: process.stdin });
-  rl.on("line", async (line) => {
+  // Track in-flight handlers so a stdin-close doesn't terminate the
+  // process before pending async work (filesystem reads, mostly) has
+  // flushed its responses to stdout.
+  const inflight = new Set();
+  rl.on("line", (line) => {
     line = line.trim();
     if (!line) return;
     let req;
@@ -157,9 +161,13 @@ async function main() {
     } catch {
       return;
     }
-    await handle(req);
+    const p = handle(req).finally(() => inflight.delete(p));
+    inflight.add(p);
   });
-  rl.on("close", () => process.exit(0));
+  rl.on("close", async () => {
+    await Promise.allSettled([...inflight]);
+    process.exit(0);
+  });
 }
 
 main();

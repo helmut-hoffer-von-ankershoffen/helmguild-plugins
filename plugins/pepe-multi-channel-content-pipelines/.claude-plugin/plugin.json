@@ -1,7 +1,7 @@
 {
   "name": "pepe-multi-channel-content-pipelines",
   "description": "Designing, monitoring, and steering autonomous content production across Instagram, X, websites, and other reach channels. One pipeline, many surfaces, principles intact.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Helmut Hoffer von Ankershoffen",
     "email": "helmuthva@gmail.com"
