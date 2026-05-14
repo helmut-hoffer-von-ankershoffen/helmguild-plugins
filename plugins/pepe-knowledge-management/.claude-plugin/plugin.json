@@ -1,0 +1,23 @@
+{
+  "name": "pepe-knowledge-management",
+  "description": "Agent + human knowledge management: the shared canonical vault every other playbook depends on, per-agent auto-memory discipline, daily learning extraction from chat history, cross-agent shared memory when a human operates multiple isolated agents, and quarterly vault coherence + drift audits. Sibling to pepe-multi-channel-content-pipelines — the content pipeline needs a place to store brand identity, cameo rosters, scene templates; this is that place plus the discipline around keeping it coherent across every agent on the operator's stack.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Helmut Hoffer von Ankershoffen",
+    "email": "helmuthva@gmail.com"
+  },
+  "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
+  "repository": "https://github.com/helmut-hoffer-von-ankershoffen/helmguild-plugins",
+  "license": "LicenseRef-helmguild-mentoring-1.0",
+  "keywords": [
+    "ammp",
+    "agentskills",
+    "mentoring",
+    "pepe-arturo",
+    "knowledge-management",
+    "obsidian",
+    "auto-memory",
+    "cross-agent",
+    "vault"
+  ]
+}

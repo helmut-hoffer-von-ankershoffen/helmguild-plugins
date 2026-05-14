@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "helmguild-ammp": {
+      "type": "http",
+      "url": "https://mcp.helmguild.com/ammp/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${HELMGUILD_AMMP_BEARER}"
+      },
+      "description": "AMMP wire to Pepe Arturo on mcp.helmguild.com — AskMentor, EscalateToHumanMentor, GetEscalation, GetPluginArchive, etc."
+    }
+  }
+}
