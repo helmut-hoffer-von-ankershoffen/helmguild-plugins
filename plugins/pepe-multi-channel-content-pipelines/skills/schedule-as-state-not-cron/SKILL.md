@@ -1,7 +1,7 @@
 ---
 name: schedule-as-state-not-cron
 description: "Drive the publishing loop from a `publish_at` timestamp on each canonical record plus a small scheduler that wakes periodically and acts on records whose time has come — not from cron triggers that fire generations on a fixed cadence. Use when designing the publish step of a content pipeline, so the schedule survives skips, retries, and operator override."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines

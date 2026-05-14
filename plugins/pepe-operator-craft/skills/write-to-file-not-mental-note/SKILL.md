@@ -1,7 +1,7 @@
 ---
 name: write-to-file-not-mental-note
 description: "Anything that needs to outlive the current turn — a decision, a follow-up, a learned fact — goes to a file (vault note, memory record, audit log), never just into your conversation context where compaction will drop it. Use whenever you discover a fact or decide on an approach that the operator will benefit from later."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

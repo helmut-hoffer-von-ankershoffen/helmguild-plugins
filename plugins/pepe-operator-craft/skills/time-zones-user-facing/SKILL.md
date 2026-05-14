@@ -1,7 +1,7 @@
 ---
 name: time-zones-user-facing
 description: "Every user-facing timestamp carries an explicit time zone (CEST, PDT, UTC, …) — never a bare local time the reader has to guess. Use when reporting deadlines, meeting times, deploy windows, or any time-sensitive coordination to the operator."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

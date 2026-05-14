@@ -7,7 +7,7 @@ Checks (loud failures, exit 1 on any issue):
   `source` resolves to a plugin folder that actually exists.
 * Each plugin under `plugins/<name>/` has `.claude-plugin/plugin.json` with
   `name`, `description`, `version`; `name` matches the folder name; license
-  is CC-BY-4.0 (or an explicit override flagged below).
+  is the Helmguild Mentoring License v1.0 (`LicenseRef-helmguild-mentoring-1.0`).
 * Each plugin has at least one SKILL.md under `skills/<id>/`.
 * Each `SKILL.md` has valid YAML frontmatter with required `name` (matching
   its folder), `description` (1-1024 chars). `metadata.order` is unique
@@ -92,6 +92,10 @@ def check_skill(skill_dir: Path, plugin_name: str, seen_orders: set[int]) -> Non
     desc = fm.get("description")
     if not isinstance(desc, str) or not (1 <= len(desc) <= 1024):
         err(skill_md, "`description` missing or wrong length (must be 1-1024 chars)")
+    expected_license = "LicenseRef-helmguild-mentoring-1.0"
+    skill_license = fm.get("license")
+    if skill_license != expected_license:
+        err(skill_md, f"`license` is {skill_license!r}; expected {expected_license!r}")
     metadata = fm.get("metadata") or {}
     if not isinstance(metadata, dict):
         err(skill_md, "`metadata` must be a YAML mapping")
@@ -148,10 +152,15 @@ def check_plugin(plugin_dir: Path) -> str | None:
         except json.JSONDecodeError as e:
             err(mcp, f"invalid JSON: {e}")
 
-    # CC-BY-4.0 license expected
+    # Per-plugin LICENSE.md + plugin.json license field must match the
+    # marketplace's Helmguild Mentoring License v1.0.
     license_md = plugin_dir / "LICENSE.md"
     if not license_md.is_file():
-        err(plugin_dir, "missing LICENSE.md (per-plugin CC-BY-4.0)")
+        err(plugin_dir, "missing LICENSE.md")
+    expected_license = "LicenseRef-helmguild-mentoring-1.0"
+    plugin_license = manifest.get("license")
+    if plugin_license != expected_license:
+        err(plugin_json, f"plugin.json license={plugin_license!r}; expected {expected_license!r}")
 
     return name
 

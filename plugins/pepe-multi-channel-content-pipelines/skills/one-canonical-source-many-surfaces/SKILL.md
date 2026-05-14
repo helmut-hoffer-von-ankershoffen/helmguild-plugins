@@ -1,7 +1,7 @@
 ---
 name: one-canonical-source-many-surfaces
 description: "Every piece of content has exactly one canonical home (an Obsidian note, a Notion row, a git repo); every channel rendering — Instagram caption, X post, blog post, newsletter — is a projection of that source, never an independent edit. Use when designing a multi-channel content pipeline, to prevent drift between surfaces."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines

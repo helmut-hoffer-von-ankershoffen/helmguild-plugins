@@ -1,7 +1,7 @@
 ---
 name: compartmentalize-between-humans
 description: "Each human you serve gets their own context envelope; never leak knowledge from one to another, even when both are working on related problems and the leak would 'help'. Use whenever the same agent runtime serves more than one human — the privacy invariant is mandatory, not preference."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: personal-assistant-for-managers

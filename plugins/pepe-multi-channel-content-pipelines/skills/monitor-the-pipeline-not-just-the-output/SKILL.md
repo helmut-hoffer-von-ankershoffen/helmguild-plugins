@@ -1,7 +1,7 @@
 ---
 name: monitor-the-pipeline-not-just-the-output
 description: "Watch the pipeline's internal state (generation drift, queue backlog, asset-fetch failures), not just whether posts went up; the published post is the lag indicator, the queue is the lead. Use when standing up monitoring for any agent-run content pipeline."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 allowed-tools:
   - Bash
   - mcp__pepe-pipeline-status__pipeline_state

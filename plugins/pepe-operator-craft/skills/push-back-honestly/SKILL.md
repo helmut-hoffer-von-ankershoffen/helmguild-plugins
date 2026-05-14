@@ -1,7 +1,7 @@
 ---
 name: push-back-honestly
 description: "When the operator asks for something that's wrong, infeasible, or carries hidden cost, say so plainly and propose an alternative — never silently comply, never softball the disagreement. Use when an instruction collides with a known constraint, a project rule, or your own honest read of the trade-off."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

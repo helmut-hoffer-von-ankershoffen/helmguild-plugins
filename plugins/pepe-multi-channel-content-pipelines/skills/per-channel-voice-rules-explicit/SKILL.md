@@ -1,7 +1,7 @@
 ---
 name: per-channel-voice-rules-explicit
 description: "Encode each channel's register, length budget, emoji policy, hashtag policy, and link-handling as data — a per-channel YAML or JSON the renderer reads — rather than implicit prose in the prompt. Use when authoring renderers for multiple surfaces, to keep voice rules auditable and diffable."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines

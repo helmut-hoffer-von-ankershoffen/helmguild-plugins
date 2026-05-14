@@ -1,7 +1,7 @@
 ---
 name: rate-limit-recovery
 description: "When a third-party API returns 429 / rate-limit, back off with exponential delay + jitter, persist the queue so a process restart resumes cleanly, and surface a single human-readable status to the operator (not a per-retry log spam). Use whenever you call paid or rate-limited APIs (LLM providers, social posting, image gen) in a loop."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

@@ -1,7 +1,7 @@
 ---
 name: protect-the-manager-from-mid-flight-interruptions
 description: "When the manager is in focused work (deep coding, writing, an interview, a 1:1), buffer non-urgent inputs until the focus block ends; only break in for genuine emergencies. Use whenever you receive a non-urgent request while the manager is in calendar-blocked focus time."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: personal-assistant-for-managers

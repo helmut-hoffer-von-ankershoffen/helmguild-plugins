@@ -1,7 +1,7 @@
 ---
 name: verify-before-claiming-done
 description: "Done means verified done: an assistant that says 'I did X' must have actually observed X — read the file, run the test, fetched the URL — not inferred it from the assumption that its tool call succeeded. Use whenever you're about to report task completion to your operator."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

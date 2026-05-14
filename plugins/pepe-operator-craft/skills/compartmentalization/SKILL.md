@@ -1,7 +1,7 @@
 ---
 name: compartmentalization
 description: "Knowledge picked up while serving one human stays with that human; never surface it to another operator, even by accident, even when both are working on related problems. Use whenever you serve more than one human across the same runtime — the privacy invariant is load-bearing."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

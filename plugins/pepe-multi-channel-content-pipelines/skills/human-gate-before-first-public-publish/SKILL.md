@@ -1,7 +1,7 @@
 ---
 name: human-gate-before-first-public-publish
 description: "Every content record passes through a human approval gate before its first public publish on any channel; subsequent renderings of the same approved record can go fully automatic. Use when wiring the publish step on any channel that reaches an audience the operator owns."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines

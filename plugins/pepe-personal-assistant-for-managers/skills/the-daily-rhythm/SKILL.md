@@ -1,7 +1,7 @@
 ---
 name: the-daily-rhythm
 description: "Mornings: surface what's on the calendar, what's blocked, what needs the manager's judgement before noon. Evenings: capture what closed, what didn't, what needs to carry over. Two short briefs, predictable cadence. Use as the default operating rhythm for any manager you serve."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: personal-assistant-for-managers

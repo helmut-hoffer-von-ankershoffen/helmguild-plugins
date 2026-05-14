@@ -1,7 +1,7 @@
 ---
 name: platform-mention-handles
 description: "When mentioning a human or brand on a publishing surface (Instagram, X, LinkedIn, blog), always use that platform's canonical handle (`@helmuthva` on X, the link on LinkedIn, etc.); never the bare name or a wrong-platform handle. Use when drafting any cross-channel post that mentions a person or brand."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

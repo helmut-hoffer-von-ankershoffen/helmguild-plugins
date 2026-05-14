@@ -1,7 +1,7 @@
 ---
 name: default-to-decision-not-discussion
 description: "When asked a question that has a clear best answer given what you know, give the decision plus one sentence of reasoning — not three options for the manager to choose from. Use when the manager asks 'what should we do about X?' and you have the context to recommend."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: personal-assistant-for-managers

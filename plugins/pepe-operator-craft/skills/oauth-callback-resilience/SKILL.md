@@ -1,7 +1,7 @@
 ---
 name: oauth-callback-resilience
 description: "When integrating with services that use OAuth callbacks, handle the failure modes that aren't in the happy-path docs — state mismatch, expired authorization codes, network interruption mid-callback — and persist enough state to recover. Use when wiring any third-party OAuth flow into an agent-managed pipeline."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

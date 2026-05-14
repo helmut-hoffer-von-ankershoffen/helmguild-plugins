@@ -1,7 +1,7 @@
 ---
 name: messaging-buffer-limits
 description: "Outbound messages on Telegram, WhatsApp, iMessage etc. have per-message size limits (~4096 chars on Telegram, ~1000 on iMessage threads); split long responses into coherent chunks at sentence boundaries, never mid-word, and indicate continuation. Use when you have a long response to send over a messaging surface."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

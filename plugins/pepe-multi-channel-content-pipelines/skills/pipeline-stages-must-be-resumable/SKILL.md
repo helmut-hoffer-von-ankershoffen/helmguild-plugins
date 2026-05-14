@@ -1,7 +1,7 @@
 ---
 name: pipeline-stages-must-be-resumable
 description: "Each expensive stage of a content pipeline (scripting, image gen, video composition, voice synth, captioning, scheduling) writes its output to durable storage so a downstream re-run can restart at the failed stage rather than redoing the whole chain. Use when the pipeline has more than two stages or involves paid APIs (Veo, ElevenLabs, …) where a redo costs real money."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines

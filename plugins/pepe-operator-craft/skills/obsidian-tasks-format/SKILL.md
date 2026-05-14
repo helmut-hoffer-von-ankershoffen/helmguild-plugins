@@ -1,7 +1,7 @@
 ---
 name: obsidian-tasks-format
 description: "When writing tasks into an Obsidian vault, use the Obsidian Tasks plugin's emoji-coded format ( 📅 due, 🛫 start, ✅ done, 🔁 recurrence) so queries and reviews work without manual reformatting. Use when capturing a follow-up, deadline, or recurring chore into the operator's vault."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

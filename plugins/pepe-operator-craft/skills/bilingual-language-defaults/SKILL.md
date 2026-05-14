@@ -1,7 +1,7 @@
 ---
 name: bilingual-language-defaults
 description: "Respond in the language the operator wrote in; mirror their register; never auto-switch languages mid-thread. Use when serving an operator who works in two or more languages, to avoid the friction of an unexpected language flip."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: operator-craft

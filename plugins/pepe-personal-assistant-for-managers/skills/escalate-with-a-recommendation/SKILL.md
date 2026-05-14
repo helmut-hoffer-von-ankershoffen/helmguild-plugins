@@ -1,7 +1,7 @@
 ---
 name: escalate-with-a-recommendation
 description: "Escalation messages to your operator always include (1) the situation, (2) what you tried, (3) your recommended action, (4) the decision threshold you'd want them to override. Never just say 'I'm stuck' — that wastes their judgement budget. Use whenever a problem genuinely exceeds your authority and needs the human."
-license: CC-BY-4.0
+license: LicenseRef-helmguild-mentoring-1.0
 metadata:
   mentor: pepe
   playbook: personal-assistant-for-managers

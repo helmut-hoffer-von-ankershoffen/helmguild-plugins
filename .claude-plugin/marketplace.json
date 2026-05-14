@@ -8,20 +8,21 @@
   },
   "metadata": {
     "version": "0.1.0",
-    "homepage": "https://www.helmguild.com/"
+    "homepage": "https://www.helmguild.com/",
+    "license": "LicenseRef-helmguild-mentoring-1.0"
   },
   "plugins": [
     {
       "name": "pepe-multi-channel-content-pipelines",
       "source": "./plugins/pepe-multi-channel-content-pipelines",
       "description": "Designing, monitoring, and steering autonomous content production across Instagram, X, websites, and other reach channels. One pipeline, many surfaces, principles intact.",
-      "version": "0.2.0",
+      "version": "1.0.0",
       "author": {
         "name": "Helmut Hoffer von Ankershoffen",
         "email": "helmuthva@gmail.com"
       },
       "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
-      "license": "CC-BY-4.0",
+      "license": "LicenseRef-helmguild-mentoring-1.0",
       "category": "agentic-mentoring",
       "keywords": [
         "ammp",
@@ -33,13 +34,13 @@
       "name": "pepe-operator-craft",
       "source": "./plugins/pepe-operator-craft",
       "description": "The day-to-day discipline of operating an agentic assistant — terse responses, bilingual defaults, push-back, compartmentalisation between the humans served. The craft rules every operator-grade agent absorbs.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "author": {
         "name": "Helmut Hoffer von Ankershoffen",
         "email": "helmuthva@gmail.com"
       },
       "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
-      "license": "CC-BY-4.0",
+      "license": "LicenseRef-helmguild-mentoring-1.0",
       "category": "agentic-mentoring",
       "keywords": [
         "ammp",
@@ -51,13 +52,13 @@
       "name": "pepe-personal-assistant-for-managers",
       "source": "./plugins/pepe-personal-assistant-for-managers",
       "description": "Calm, operator-grade support for executives steering ambiguous days. Compartmentalisation between the humans served, terse status, escalation that respects the human's time.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "author": {
         "name": "Helmut Hoffer von Ankershoffen",
         "email": "helmuthva@gmail.com"
       },
       "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
-      "license": "CC-BY-4.0",
+      "license": "LicenseRef-helmguild-mentoring-1.0",
       "category": "agentic-mentoring",
       "keywords": [
         "ammp",
