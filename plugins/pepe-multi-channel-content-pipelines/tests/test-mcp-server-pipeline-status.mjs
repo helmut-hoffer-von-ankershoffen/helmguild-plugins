@@ -121,12 +121,26 @@ test("setup_readiness probes all channels and returns JSON", async () => {
     assert.equal(payload.exit_code, 1);
     assert.ok(Array.isArray(payload.channels));
     const ids = payload.channels.map((c) => c.channel).sort();
-    assert.deepEqual(ids, ["blog", "instagram", "strategy", "veo", "x"]);
-    // Veo / Instagram / X / Blog all report `missing` against empty creds.
-    for (const ch of ["veo", "instagram", "x", "blog"]) {
+    // setup-doctor probes 7 channels: the 5 publishing channels + the 2
+    // upstream playbook skills (brand-identity, cameo-protocol). The
+    // 5 in pipeline_channels are publishing channels only.
+    assert.deepEqual(ids, [
+      "blog",
+      "brand-identity",
+      "cameo-protocol",
+      "instagram",
+      "strategy",
+      "veo",
+      "x",
+    ]);
+    // Veo / Instagram / X / Blog / brand-identity all report `missing` against empty creds.
+    for (const ch of ["veo", "instagram", "x", "blog", "brand-identity"]) {
       const row = payload.channels.find((c) => c.channel === ch);
       assert.equal(row.status, "missing", `${ch} should be missing`);
     }
+    // cameo-protocol is optional — reports `skipped-offline` when no roster.
+    const cameo = payload.channels.find((c) => c.channel === "cameo-protocol");
+    assert.equal(cameo.status, "skipped-offline", "cameo-protocol should be skipped-offline (optional)");
   } finally {
     rmSync(tmpCreds, { recursive: true, force: true });
     rmSync(tmpState, { recursive: true, force: true });
