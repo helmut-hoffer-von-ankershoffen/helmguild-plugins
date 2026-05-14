@@ -28,12 +28,12 @@ This skill is the artefact that fixes all three: **one vault, Markdown, structur
    ```sh
    scripts/vault-scaffold.sh \
      --vault-root <PATH_TO_VAULT> \
-     --operator "<operator-id>" \
-     --brand "<brand-name>" \
-     --agents "<agent-1>,<agent-2>,..."
+     --operator "<operator-slug>" \
+     --brand "<brand-slug>" \
+     --agents "<agent-1>,<agent-2>,..."   # e.g. pepe,cowork,hermes
    ```
 
-   Writes the directory skeleton + a `README.md` describing each top-level dir + the `MEMORY.md` index template + an `_shared/Changelog.md` seed.
+   Writes the directory skeleton + a `README.md` describing each top-level dir + the `MEMORY.md` index (linking operator / brand / each agent's charter) + `_shared/Conventions.md` + `_shared/Privacy.md` + `_shared/Changelog.md` seed + stubs for every operator + brand + per-agent doc. Both slugs must be lowercase kebab. 36 unit tests cover the scaffolder.
 
 2. **Pick the vault backend.** Three sane choices, each with its own properties:
    * **Shared Obsidian vault** (recommended for solo operators). Local-first, syncs across devices via iCloud / Obsidian Sync / Syncthing. AI agents read via filesystem mounts. Best for: single-human operator running multiple agents.
