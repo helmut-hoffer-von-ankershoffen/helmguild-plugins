@@ -162,12 +162,11 @@ def check_plugin(plugin_dir: Path) -> str | None:
     if plugin_license != expected_license:
         err(manifest_path, f"plugin.json license={plugin_license!r}; expected {expected_license!r}")
 
-    # Every plugin in this marketplace is commercial; the sibling
-    # helmguild-plugins-public repo holds non-commercial community
-    # plugins. The flag is mirrored on the marketplace.json entry
-    # for catalogue-time visibility.
-    if manifest.get("commercial") is not True:
-        err(manifest_path, "plugin.json `commercial: true` required in the helmguild-plugins (private) marketplace")
+    # NOTE on `commercial`: Claude Code's plugin.json schema rejects
+    # custom top-level keys (including `commercial` and `metadata`).
+    # The commercial flag is therefore carried on the marketplace.json
+    # side only — both at `metadata.commercial` and on each plugin
+    # entry — and enforced in `main()` below. plugin.json stays clean.
 
     # Every bundled script (under scripts/ or mcp-server/) must have a
     # matching test under tests/test-<dir>-<stem>.{sh,mjs}. Catches the
