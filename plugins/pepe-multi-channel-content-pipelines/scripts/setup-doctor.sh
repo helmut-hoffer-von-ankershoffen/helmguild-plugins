@@ -31,7 +31,7 @@
 
 set -euo pipefail
 
-channels_all=(veo instagram x blog strategy)
+channels_all=(brand-identity cameo-protocol veo instagram x blog strategy)
 selected=()
 output_format=text
 offline=0
@@ -66,6 +66,92 @@ push() {
   result_channels+=("$1")
   result_status+=("$2")
   result_detail+=("$3")
+}
+
+# --- brand-identity ---------------------------------------------------
+probe_brand_identity() {
+  local env_file="$creds_root/brand/env"
+  local style_path
+  if [[ -n "${BRAND_STYLE_GUIDE_PATH:-}" ]]; then
+    style_path="$BRAND_STYLE_GUIDE_PATH"
+  elif [[ -s "$env_file" ]]; then
+    style_path=$(grep -E '^BRAND_STYLE_GUIDE_PATH=' "$env_file" | head -1 | cut -d= -f2-)
+    if [[ -z "$style_path" ]]; then
+      push brand-identity missing "env file present but BRAND_STYLE_GUIDE_PATH missing"
+      return
+    fi
+  else
+    push brand-identity missing "no $env_file (and BRAND_STYLE_GUIDE_PATH not set)"
+    return
+  fi
+  if [[ ! -d "$style_path" ]]; then
+    push brand-identity error "BRAND_STYLE_GUIDE_PATH points at non-directory: $style_path"
+    return
+  fi
+  # Required artefacts (matches the brand-identity-scaffold output).
+  local missing=()
+  for f in character.md voice.md off-brand.md redo-criteria.md; do
+    [[ -e "$style_path/$f" ]] || missing+=("$f")
+  done
+  if [[ ! -d "$style_path/disciplines" ]] || [[ -z "$(ls -A "$style_path/disciplines" 2>/dev/null)" ]]; then
+    missing+=("disciplines/")
+  fi
+  if [[ ! -d "$style_path/refs/character" ]]; then
+    missing+=("refs/character/")
+  fi
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    push brand-identity partial "store at $style_path, missing: ${missing[*]}"
+    return
+  fi
+  push brand-identity ready "style guide at $style_path (character + voice + disciplines + redo-criteria + refs all present)"
+}
+
+# --- cameo-protocol ---------------------------------------------------
+probe_cameo_protocol() {
+  local env_file="$creds_root/cameos/env"
+  local roster_root
+  if [[ -n "${CAMEO_ROSTER_ROOT:-}" ]]; then
+    roster_root="$CAMEO_ROSTER_ROOT"
+  elif [[ -s "$env_file" ]]; then
+    roster_root=$(grep -E '^CAMEO_ROSTER_ROOT=' "$env_file" | head -1 | cut -d= -f2-)
+  else
+    # Cameo protocol is optional — a pure-fictional-character brand
+    # doesn't need it. Surface as `skipped-offline` so the doctor
+    # doesn't fail the whole pipeline for an absent cameo roster.
+    push cameo-protocol skipped-offline "no $env_file and CAMEO_ROSTER_ROOT not set (optional skill — set up only if real humans appear in content)"
+    return
+  fi
+  if [[ -z "$roster_root" ]]; then
+    push cameo-protocol missing "env file present but CAMEO_ROSTER_ROOT empty"
+    return
+  fi
+  if [[ ! -d "$roster_root" ]]; then
+    push cameo-protocol error "CAMEO_ROSTER_ROOT points at non-directory: $roster_root"
+    return
+  fi
+  if [[ ! -e "$roster_root/roster.md" ]]; then
+    push cameo-protocol partial "roster root exists but roster.md missing — run scripts/cameo-roster-scaffold.sh"
+    return
+  fi
+  # Count person directories (each must have at least ref-index.json + consent-record.md).
+  local persons=0 incomplete=()
+  for d in "$roster_root"/*/; do
+    [[ -d "$d" ]] || continue
+    persons=$((persons+1))
+    local who; who=$(basename "$d")
+    for f in ref-index.json consent-record.md; do
+      [[ -e "$d/$f" ]] || incomplete+=("$who/$f")
+    done
+  done
+  if [[ "$persons" -eq 0 ]]; then
+    push cameo-protocol partial "roster.md exists but no person directories"
+    return
+  fi
+  if [[ ${#incomplete[@]} -gt 0 ]]; then
+    push cameo-protocol partial "$persons person(s); missing files: ${incomplete[*]}"
+    return
+  fi
+  push cameo-protocol ready "$persons person(s) with ref-index + consent records"
 }
 
 # --- veo --------------------------------------------------------------
@@ -246,6 +332,8 @@ probe_strategy() {
 # Run the selected probes.
 for ch in "${selected[@]}"; do
   case "$ch" in
+    brand-identity) probe_brand_identity;;
+    cameo-protocol) probe_cameo_protocol;;
     veo) probe_veo;;
     instagram) probe_instagram;;
     x) probe_x;;

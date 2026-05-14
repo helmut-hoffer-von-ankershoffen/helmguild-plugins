@@ -23,45 +23,55 @@ This skill is the **first** skill in the playbook (`order: 1`) because it's a pr
 
 **Audience: the human operator.** The agent walks each numbered step.
 
-1. **Pick the brand-identity store.** The document must be readable by every agent that may generate content for this brand. Sane choices:
+1. **Scaffold the empty templates.** Run the bundled scaffolder to write the directory skeleton + empty files for every section this Setup command authors:
+
+   ```sh
+   scripts/brand-identity-scaffold.sh --path <BRAND_STYLE_GUIDE_PATH> \
+       --brand "<Brand Name>" \
+       --disciplines "talking-head suit candid"   # or whatever fits the brand
+   ```
+
+   This writes `character.md`, `voice.md`, `palette.md`, `typography.md`, `off-brand.md`, `redo-criteria.md`, `disciplines/<each>.md`, `scenes/_template.md`, `refs/character/README.md`, plus a top-level `README.md`. The next steps are fill-in-the-blanks against this skeleton.
+
+2. **Pick the brand-identity store.** The document must be readable by every agent that may generate content for this brand. Sane choices:
    * **Shared Obsidian vault** — synced across the operator's devices + agents that mount the vault. Best for solo operators with multiple AI runtimes.
    * **Private GitHub repo** — `<brand>-style-guide` with a Markdown file per section. Best for engineering-flavoured operators.
    * **Notion / Confluence DB** — accessible via API. Best for teams.
    The agent reads from this location on first connect; the location is persisted as `BRAND_STYLE_GUIDE_PATH` in `~/.openclaw/credentials/brand/env`.
-2. **Author the character one-pager.** A single paragraph + headshot grid. The paragraph names the character (real or fictional), their visible-age range, body type, signature visual marks. The headshot grid is 3-6 reference images covering the character in different lighting / moods. Persist as `<store>/character.md` + `<store>/refs/character/`.
-3. **Author the per-discipline contracts.** Each "discipline" is a recurring scene category for this brand. For a fitness/sport brand: swim, run, bike, strength, talking-head. For a cooking brand: prep, plating, eating, kitchen-tour, ingredient-portrait. For a finance brand: solo-explainer, whiteboard-walkthrough, candid-with-pet. Each discipline gets a one-paragraph contract:
+3. **Author the character one-pager.** A single paragraph + headshot grid. The paragraph names the character (real or fictional), their visible-age range, body type, signature visual marks. The headshot grid is 3-6 reference images covering the character in different lighting / moods. Persist as `<store>/character.md` + `<store>/refs/character/`.
+4. **Author the per-discipline contracts.** Each "discipline" is a recurring scene category for this brand. For a fitness/sport brand: swim, run, bike, strength, talking-head. For a cooking brand: prep, plating, eating, kitchen-tour, ingredient-portrait. For a finance brand: solo-explainer, whiteboard-walkthrough, candid-with-pet. Each discipline gets a one-paragraph contract:
    * Setting + framing.
    * Outfit/gear (with the **softened** brand-name versions; see `real-person-cameo-protocol` Command 3).
    * Lighting + camera (focal length, shot type).
    * Voice cadence + tone for any spoken line.
    * Audio ambience hints.
    Persist as `<store>/disciplines/<name>.md`.
-4. **Define the colour palette + typography.** Three primary colours + two secondary, with hex codes. One headline typeface + one body typeface. Used by the blog (CSS), by image-generation prompts (when ordering thumbnails or hero images), by physical merchandise if/when the brand ships any. Persist as `<store>/palette.md` + `<store>/typography.md`.
-5. **Author the scene template library.** Beyond per-discipline contracts, name the scenes the brand revisits — the recurring visual motifs that make a body of work feel coherent. Pepe's: "Pepe sitting cross-legged on a mountain at dawn", "Pepe walking through a kitchen", "Pepe and Helmut at the kitchen table over coffee", "Helmut training solo at sunrise". Each template:
+5. **Define the colour palette + typography.** Three primary colours + two secondary, with hex codes. One headline typeface + one body typeface. Used by the blog (CSS), by image-generation prompts (when ordering thumbnails or hero images), by physical merchandise if/when the brand ships any. Persist as `<store>/palette.md` + `<store>/typography.md`.
+6. **Author the scene template library.** Beyond per-discipline contracts, name the scenes the brand revisits — the recurring visual motifs that make a body of work feel coherent. Pepe's: "Pepe sitting cross-legged on a mountain at dawn", "Pepe walking through a kitchen", "Pepe and Helmut at the kitchen table over coffee", "Helmut training solo at sunrise". Each template:
    * Sketch in words (3-5 sentences).
    * Where it works as a scene (which arc, what hook).
    * What gear / refs / cameos are pre-resolved.
    * Stock Veo prompt fragment.
    Persist as `<store>/scenes/<slug>.md`.
-6. **Author the voice + tone rules.** The brand's spoken voice across surfaces. For Pepe: "calm, grounded, succinct, sport-flavoured English, no Italian, no filler, slow cadence". Plus a list of phrases that are **on-brand** (acceptable verbatim) and **off-brand** (never use). Plus the brand emoji signature (Pepe: 🍝 on every post; see `publishing-instagram` Command 5). Persist as `<store>/voice.md`.
-7. **Author the off-brand list.** This is what the visual-styling guide says **never to do**. Common entries:
+7. **Author the voice + tone rules.** The brand's spoken voice across surfaces. For Pepe: "calm, grounded, succinct, sport-flavoured English, no Italian, no filler, slow cadence". Plus a list of phrases that are **on-brand** (acceptable verbatim) and **off-brand** (never use). Plus the brand emoji signature (Pepe: 🍝 on every post; see `publishing-instagram` Command 5). Persist as `<store>/voice.md`.
+8. **Author the off-brand list.** This is what the visual-styling guide says **never to do**. Common entries:
    * Outfit/gear combinations that read as off-brand (wrong cap with wrong wetsuit; suit with sneakers; etc.).
    * Lighting setups that misrepresent the brand (harsh fluorescent for a calm-grounded brand).
    * Character poses that contradict the voice (frenetic motion for a calm character).
    * Backgrounds that pull focus from the character (busy stages for a contemplative character).
    * Any third-party trademark or logo not licensed.
    Each entry has a one-line description + (where useful) a "before/after" pair: a wrong example + the on-brand replacement. Persist as `<store>/off-brand.md`.
-8. **Define the redo criteria.** What makes a generated shot a redo vs. a "ship it"? Make it binary, not a feeling. Pepe's:
+9. **Define the redo criteria.** What makes a generated shot a redo vs. a "ship it"? Make it binary, not a feeling. Pepe's:
    * Face drifts mid-shot? → redo.
    * Outfit doesn't match the discipline contract? → redo.
    * Audio is missing when the prompt asked for VO? → redo (Veo RAI rejection; soften and retry).
    * Background pulls focus? → redo.
-   * One of the off-brand entries from step 7 is present? → redo.
+   * One of the off-brand entries from step 9 is present? → redo.
    * Frame rate stutter? → redo.
    * None of the above + the piece is on-brand within the discipline contract? → ship.
    Persist as `<store>/redo-criteria.md`.
-9. **Cross-agent visibility.** Whatever store you picked in step 1, make sure every agent on the operator's stack reads it on first connect. For shared Obsidian vault: mount the same vault in every runtime (Claude Cowork, the mentee agent running Claude Code, ad-hoc Claude.ai sessions via the shared-vault-symlink pattern). For private GitHub: each agent has read access via SSH key or a tokenised HTTPS clone. For Notion DB: each agent has an API token. The `BRAND_STYLE_GUIDE_PATH` env var resolves the location for the agent.
-10. **Smoke-test.** Have the agent read the brand identity doc and produce a one-page summary of what it learned. Compare against the operator's mental model. If anything drifts, the doc is missing a section — go back and add it. Iterate until summary = mental model.
+10. **Cross-agent visibility.** Whatever store you picked in step 2, make sure every agent on the operator's stack reads it on first connect. For shared Obsidian vault: mount the same vault in every runtime (Claude Cowork, the mentee agent running Claude Code, ad-hoc Claude.ai sessions via the shared-vault-symlink pattern). For private GitHub: each agent has read access via SSH key or a tokenised HTTPS clone. For Notion DB: each agent has an API token. The `BRAND_STYLE_GUIDE_PATH` env var resolves the location for the agent.
+11. **Smoke-test.** Have the agent read the brand identity doc and produce a one-page summary of what it learned. Compare against the operator's mental model. If anything drifts, the doc is missing a section — go back and add it. Iterate until summary = mental model.
 
 Operator confirms: "Brand visual identity live."
 

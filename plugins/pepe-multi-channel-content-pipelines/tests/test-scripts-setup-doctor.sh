@@ -21,20 +21,26 @@ creds="$tmpdir/creds"
 state="$tmpdir/state"
 mkdir -p "$creds" "$state"
 
-# 1. Empty tree: every channel reports `missing`; exit 1.
+# 1. Empty tree: every channel reports `missing` (or `skipped-offline` for
+# cameo-protocol, which is optional and `partial` for strategy because the
+# bare state dir from the test fixture exists); exit 1.
 code=0
 out=$("$HELPER" --offline --creds-root "$creds" --state-dir "$state" 2>&1) || code=$?
 if [[ "$code" == 1 ]]; then ok "empty tree exits 1"; else err "empty tree should exit 1 (got $code)"; fi
-# strategy probe sees the bare state dir (mkdir above) and reports
-# `partial` because publish-log.jsonl isn't there yet; the four
-# credential-backed channels report `missing`.
-for ch in veo instagram x blog; do
+for ch in brand-identity veo instagram x blog; do
   if echo "$out" | grep -qE "^✗ ${ch} +missing"; then
     ok "empty tree: ${ch} missing"
   else
     err "empty tree: ${ch} not reported missing"
   fi
 done
+# cameo-protocol is optional — reports skipped-offline when no roster
+# root configured (a pure-fictional-character brand doesn't need it).
+if echo "$out" | grep -qE '^∅ cameo-protocol +skipped-offline'; then
+  ok "empty tree: cameo-protocol skipped-offline (optional)"
+else
+  err "empty tree: cameo-protocol should be skipped-offline (got: $out)"
+fi
 if echo "$out" | grep -qE '^◐ strategy +partial'; then
   ok "empty tree: strategy partial (state dir but no publish-log)"
 else
@@ -51,12 +57,50 @@ else
   err "--channel veo should emit 1 line, got $veo_lines"
 fi
 
+# 3a. brand-identity probe: scaffold a complete brand dir + assert ready.
+brand_dir=$(mktemp -d)
+mkdir -p "$brand_dir/disciplines" "$brand_dir/refs/character"
+touch "$brand_dir/character.md" "$brand_dir/voice.md" "$brand_dir/off-brand.md" "$brand_dir/redo-criteria.md" "$brand_dir/disciplines/test.md"
+code=0
+out=$(BRAND_STYLE_GUIDE_PATH="$brand_dir" "$HELPER" --offline --channel brand-identity --creds-root "$creds" --state-dir "$state" 2>&1) || code=$?
+if [[ "$code" == 0 ]] && echo "$out" | grep -qE '^✓ brand-identity +ready'; then
+  ok "brand-identity ready when artefacts present"
+else
+  err "brand-identity should be ready with full artefacts (got code=$code, out=$out)"
+fi
+rm -rf "$brand_dir"
+
+# 3b. cameo-protocol probe: scaffold a roster + assert ready.
+cameos=$(mktemp -d)
+echo "# Cameo roster" > "$cameos/roster.md"
+mkdir -p "$cameos/helmut/refs"
+echo "{}" > "$cameos/helmut/ref-index.json"
+echo "consent" > "$cameos/helmut/consent-record.md"
+code=0
+out=$(CAMEO_ROSTER_ROOT="$cameos" "$HELPER" --offline --channel cameo-protocol --creds-root "$creds" --state-dir "$state" 2>&1) || code=$?
+if [[ "$code" == 0 ]] && echo "$out" | grep -qE '^✓ cameo-protocol +ready'; then
+  ok "cameo-protocol ready with full roster"
+else
+  err "cameo-protocol should be ready (got code=$code, out=$out)"
+fi
+rm -rf "$cameos"
+
 # 3. Populated creds + offline → skipped-offline for credentialed channels.
-mkdir -p "$creds/gemini" "$creds/instagram" "$creds/x" "$creds/blog" "$tmpdir/blog"
+mkdir -p "$creds/gemini" "$creds/instagram" "$creds/x" "$creds/blog" "$creds/brand" "$creds/cameos" "$tmpdir/blog"
 echo "fake-key" > "$creds/gemini/api-key"
 printf 'IG_USER_ID=12345\nIG_PAGE_TOKEN=tok\n' > "$creds/instagram/env"
 printf 'X_CLIENT_ID=cid\nX_CLIENT_SECRET=csec\nX_REFRESH_TOKEN=rtok\n' > "$creds/x/env"
 printf "BLOG_ROOT=$tmpdir/blog\nBLOG_PUBLIC_URL=https://example.invalid\n" > "$creds/blog/env"
+# brand-identity: point env at a complete brand store.
+mkdir -p "$tmpdir/brand-store/disciplines" "$tmpdir/brand-store/refs/character"
+touch "$tmpdir/brand-store/character.md" "$tmpdir/brand-store/voice.md" "$tmpdir/brand-store/off-brand.md" "$tmpdir/brand-store/redo-criteria.md" "$tmpdir/brand-store/disciplines/test.md"
+printf "BRAND_STYLE_GUIDE_PATH=$tmpdir/brand-store\n" > "$creds/brand/env"
+# cameo-protocol: point env at a complete roster.
+mkdir -p "$tmpdir/cameo-store/helmut/refs"
+echo "# Roster" > "$tmpdir/cameo-store/roster.md"
+echo "{}" > "$tmpdir/cameo-store/helmut/ref-index.json"
+echo "consent" > "$tmpdir/cameo-store/helmut/consent-record.md"
+printf "CAMEO_ROSTER_ROOT=$tmpdir/cameo-store\n" > "$creds/cameos/env"
 touch "$state/publish-log.jsonl"
 code=0
 out=$("$HELPER" --offline --creds-root "$creds" --state-dir "$state" 2>&1) || code=$?
@@ -96,13 +140,12 @@ else
 fi
 printf "BLOG_ROOT=$tmpdir/blog\nBLOG_PUBLIC_URL=https://example.invalid\n" > "$creds/blog/env"
 
-# 6. JSON output is parseable and shape-correct.
+# 6. JSON output is parseable and shape-correct (7 channels now).
 code=0
 out=$("$HELPER" --offline --json --creds-root "$creds" --state-dir "$state" 2>&1) || code=$?
-# Minimal JSON sanity: starts with [, ends with ], 5 channel objects.
 if [[ "${out:0:1}" == "[" && "${out: -1}" == "]" ]] \
-   && [[ $(echo "$out" | grep -c '"channel"') == "5" ]]; then
-  ok "JSON output shape (5 channel objects)"
+   && [[ $(echo "$out" | grep -c '"channel"') == "7" ]]; then
+  ok "JSON output shape (7 channel objects)"
 else
   err "JSON output unexpected: $out"
 fi

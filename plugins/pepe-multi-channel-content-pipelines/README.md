@@ -36,7 +36,10 @@ The plugin ships:
   * `pipeline_channels` — list of the five publishing channels this plugin operates (each names the skill it backs).
   * `setup_readiness` — per-channel readiness probe (wraps `scripts/setup-doctor.sh --json`). On first connect, a mentee agent calls this to decide whether the operator's pipeline is wired up enough to run procedural commands, or whether to route the request back to a Setup step.
 * **Scripts** (`scripts/`) — operator-runnable helpers:
-  * `setup-doctor.sh` — probe each channel's credentials + API surface and report per-channel readiness (`ready` / `partial` / `missing` / `error` / `skipped-offline`). The "did I do Setup correctly?" check. Run after completing each skill's Command 1 — exits 0 only when every probed channel is `ready`. Supports `--channel <name>`, `--json`, and `--offline`.
+  * `setup-doctor.sh` — probe each channel's credentials + API surface and report per-channel readiness (`ready` / `partial` / `missing` / `error` / `skipped-offline`). The "did I do Setup correctly?" check. Run after completing each skill's Command 1 — exits 0 only when every probed channel is `ready`. Supports `--channel <name>`, `--json`, `--offline`. Probes all 7 channels: brand-identity, cameo-protocol (optional), veo, instagram, x, blog, strategy.
+  * `brand-identity-scaffold.sh` — write the empty template directory the `brand-visual-identity` skill's Setup walks the operator through filling in (character.md, voice.md, palette.md, typography.md, off-brand.md, redo-criteria.md, disciplines/, scenes/, refs/character/).
+  * `cameo-roster-scaffold.sh` — write the per-person directory layout the `real-person-cameo-protocol` skill expects (ref-index.json, outfit-contract.md, context-rules.md, platform-routing.json, consent-record.md, refs/, plus a top-level roster.md).
+  * `state-dir-init.sh` — initialise the canonical pipeline state directory the `content-strategy-planning-optimization` skill expects (publish-log.jsonl, audit.jsonl, plan-week template, veo-queue/, .gitignore).
   * `inspect-content-state.sh` — read-only dump of `$PEPE_PIPELINE_STATE_DIR` (queue + audit log).
   * `instagram-caption-lint.sh` — caption linter (length, hook, hashtag count, emoji signature, banned phrases).
   * `veo-prompt-skeleton.sh` — render a Veo 3.1 prompt skeleton from a one-line brief.

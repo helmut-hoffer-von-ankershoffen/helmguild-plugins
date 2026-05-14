@@ -23,7 +23,17 @@ If the brand has no real-person cameos (a pure-fictional-character brand), this 
 
 **Audience: the human operator.** The agent walks the operator through each numbered step.
 
-1. **Build the cameo roster.** Every real person who may appear in brand content is a row in the roster. Even the operator-of-themselves counts. Initial fields per person:
+1. **Scaffold the roster templates.** Run the bundled scaffolder to write the per-person directory skeleton for every named cameo:
+
+   ```sh
+   scripts/cameo-roster-scaffold.sh --root <CAMEO_ROSTER_ROOT> \
+       --person <id>:"<Display Name>" \
+       --person <id>:"<Display Name>" ...
+   ```
+
+   This creates `<root>/<id>/{ref-index.json,outfit-contract.md,context-rules.md,platform-routing.json,consent-record.md,refs/}` for each person and a top-level `roster.md` index. The next steps fill those templates in.
+
+2. **Build the cameo roster.** Every real person who may appear in brand content is a row in the roster. Even the operator-of-themselves counts. Initial fields per person:
    * `id` — kebab-case slug (`helmut`, `sandra`, `co-founder-mia`).
    * `display_name` — what shows in captions + collaborator invites.
    * `relationship_to_operator` — self / partner / colleague / family / friend / public-figure-with-permission.
@@ -31,12 +41,12 @@ If the brand has no real-person cameos (a pure-fictional-character brand), this 
    * `consent_record_path` — where the signed/text-of-record consent lives (Obsidian note, GitHub repo, paper photo, etc.).
    * `platforms_allowed[]` — subset of `[instagram, x, blog]`. Some people consent to one surface only.
    * `cameo_kind_rules[]` — what scenes they may appear in (e.g. "sport: yes" / "drinking alcohol: no" / "controversial topic: ask first").
-2. **Record consent.** For every roster entry except the operator-of-themselves, get explicit consent and persist the record. Forms that work:
+3. **Record consent.** For every roster entry except the operator-of-themselves, get explicit consent and persist the record. Forms that work:
    * **Signed paper/PDF** — scanned, filed at `consent_record_path`.
    * **Written-text consent in a private chat** — copied verbatim into the consent record, with timestamp + chat-platform metadata.
    * **Stand-in: a partner / family member who is in the loop on the brand and has previously agreed in conversation** — record the conversation excerpt + date in a private note. Less formal than signed, but acceptable for low-risk cameos. For sensitive cameos (anything involving the cameo subject's likeness in a way they could plausibly object to), get explicit per-batch greenlight even if a general consent exists.
    * **Public figure** — only with documented permission (DM, email, contract). Implicit consent from "they're famous" is not consent.
-3. **Build the per-person face-reference library.** Same person, different shots for different disciplines. A talking-head face ref doesn't generate a believable swim sequence. The library is a directory per person:
+4. **Build the per-person face-reference library.** Same person, different shots for different disciplines. A talking-head face ref doesn't generate a believable swim sequence. The library is a directory per person:
 
    ```
    <brand>/refs/<person-id>/
@@ -68,20 +78,20 @@ If the brand has no real-person cameos (a pure-fictional-character brand), this 
    }
    ```
 
-4. **Build the per-discipline outfit + gear contract.** For each discipline the cameo can appear in, write a one-paragraph "what's on-brand" spec:
+5. **Build the per-discipline outfit + gear contract.** For each discipline the cameo can appear in, write a one-paragraph "what's on-brand" spec:
    * **Swim:** Orca wetsuit, Orca swim cap, goggles (Orca or Roka). Not: Nike or generic-branded swim gear.
    * **Run:** black running cap (Orca or unbranded), light technical tee, daylight. Not: heavy winter layers, branded gym wear.
    * **Bike:** Canyon Speedmax or generic TT bike, black aero helmet, daylight. Not: road-bike upright posture, helmet-less.
    * **Strength:** kettlebell or barbell, hoodie or technical shirt, alpine/outdoor backdrop OK. Not: gym mirrors.
    * **Suit:** dark blazer, no tie unless context demands, neutral background.
    These specs become Veo prompt fragments. Persist as `<brand>/refs/<person-id>/outfit-contract.md`.
-5. **Define the per-person privacy / context rules.** For each person, what cameos require explicit per-batch greenlight beyond the default consent? Common patterns:
+6. **Define the per-person privacy / context rules.** For each person, what cameos require explicit per-batch greenlight beyond the default consent? Common patterns:
    * **Partner / spouse appearing alongside the operator** → per-batch greenlight (couple-reel content has a different emotional weight than solo content).
    * **Children** → very high bar; default to absolute embargo unless legal guardian + child both consent + a clear safeguarding policy exists.
    * **Drinking alcohol** → per-batch.
    * **Political or polarised topics** → per-batch, even if the person is otherwise an approved default cameo.
    Persist these per-person as `<brand>/refs/<person-id>/context-rules.md`.
-6. **Define the platform routing rules.** Some people consent to public publish on IG but not on X (different audience, different risk surface). Persist per-person:
+7. **Define the platform routing rules.** Some people consent to public publish on IG but not on X (different audience, different risk surface). Persist per-person:
 
    ```json
    {
@@ -93,7 +103,7 @@ If the brand has no real-person cameos (a pure-fictional-character brand), this 
    ```
 
    The publishing skills (`publishing-instagram`, `publishing-x`, `publishing-blog`) read this and refuse to publish to a denied platform.
-7. **Set the per-person sport-emoji signature** (if the brand voice uses it). Pepe's mapping:
+8. **Set the per-person sport-emoji signature** (if the brand voice uses it). Pepe's mapping:
 
    | Discipline | Emoji bundle |
    |-------|-----|
@@ -106,7 +116,7 @@ If the brand has no real-person cameos (a pure-fictional-character brand), this 
    | Candid | 🤝🍝 |
 
    The caption-render step picks the bundle based on the cameo's discipline tag on the canonical piece.
-8. **Smoke-test the whole protocol.** Pick the lowest-risk cameo (operator-of-themselves, talking-head, indoor, neutral). Run `virtual-character-veo-3-1` Command 3 with the person's ref + outfit contract. Inspect the output. If face matches, outfit is on-brand, and the validation in `virtual-character-veo-3-1` Command 4 passes → the protocol works. If not, fix the refs and re-shoot.
+9. **Smoke-test the whole protocol.** Pick the lowest-risk cameo (operator-of-themselves, talking-head, indoor, neutral). Run `virtual-character-veo-3-1` Command 3 with the person's ref + outfit contract. Inspect the output. If face matches, outfit is on-brand, and the validation in `virtual-character-veo-3-1` Command 4 passes → the protocol works. If not, fix the refs and re-shoot.
 
 Operator confirms: "Cameo protocol live."
 

@@ -24,13 +24,21 @@ This is the only skill in the playbook that talks to the operator in **planning*
 
 **Audience: the human operator.**
 
-1. **Define the brand's content arcs.** An *arc* is a multi-piece theme (e.g. "five principles for resilient operators", "Snowflake values series", "morning ritual mini-thoughts"). Pick 2-4 arcs to run in parallel. Trying more dilutes everything.
-2. **Pick the canonical content store.** Three sane choices:
+1. **Initialise the state directory.** Run the bundled scaffolder to lay down the canonical pipeline state layout (logs + plan templates + .gitignore):
+
+   ```sh
+   scripts/state-dir-init.sh --path <PEPE_PIPELINE_STATE_DIR> [--canonical-here]
+   ```
+
+   `--canonical-here` also creates `pieces/` under the state dir for operators who want the canonical content store co-located with state. Skip it if the canonical store lives in Obsidian / Notion / a separate Git repo (more common).
+
+2. **Define the brand's content arcs.** An *arc* is a multi-piece theme (e.g. "five principles for resilient operators", "Snowflake values series", "morning ritual mini-thoughts"). Pick 2-4 arcs to run in parallel. Trying more dilutes everything.
+3. **Pick the canonical content store.** Three sane choices:
    * **Obsidian vault** — Markdown files, structured frontmatter. Best for solo operators + AI agents (file IO is trivial).
    * **Notion database** — structured records, API for the agent. Best for teams.
    * **Git repo** — schemas as JSON / YAML files; commit history is the audit trail. Best for engineering-flavored operators.
    The agent reads from + writes to this store; channel skills read finished pieces here.
-3. **Define the canonical content schema.** Minimum fields per piece:
+4. **Define the canonical content schema.** Minimum fields per piece:
    * `id` — stable kebab-case slug.
    * `title` — display title.
    * `arc` — which arc this piece belongs to.
@@ -40,24 +48,24 @@ This is the only skill in the playbook that talks to the operator in **planning*
    * `channels[]` — array of `{channel, status, scheduled_at, published_at, url}` rows.
    * `status` — `draft | gated | scheduled | publishing | published | archived`.
    * `created_at`, `updated_at`.
-4. **Pick the editorial cadence.** A sustainable cadence is **fewer pieces, higher consistency** rather than the reverse. Defaults to start with:
+5. **Pick the editorial cadence.** A sustainable cadence is **fewer pieces, higher consistency** rather than the reverse. Defaults to start with:
    * IG reels: 2-3 / week.
    * X cross-posts: matched 1:1 with IG.
    * Blog posts: 1-2 / month, each anchoring an arc.
    * X-only threads: 1-2 / week.
    Adjust based on Command 5 after 30 days.
-5. **Configure the analytics surface.** For each channel:
+6. **Configure the analytics surface.** For each channel:
    * **Instagram Insights:** Graph API `/<MEDIA_ID>/insights?metric=reach,impressions,saves,shares` per post; `/<IG_USER_ID>/insights` for account-wide.
    * **X analytics:** API v2 `/tweets/<id>?tweet.fields=public_metrics` per tweet.
    * **Blog:** Cloudflare Web Analytics (free, GDPR-friendly, no cookies) or Plausible / Fathom. Pull rolled-up numbers from the API; per-URL pageviews for arc-level optimisation.
-6. **Decide the privacy + consent rules.** Operator-specific. Per-person consent for any real human appearing in content, per-batch consent for any sensitive cameo. Persist as a structured `consent.md` in the canonical store; the agent checks before publishing any piece that names or shows a person.
-7. **Configure the human-gate policy.** `gated` status means the piece sits in the store until the operator manually flips it to `scheduled`. Defaults:
+7. **Decide the privacy + consent rules.** Operator-specific. Per-person consent for any real human appearing in content, per-batch consent for any sensitive cameo. Persist as a structured `consent.md` in the canonical store; the agent checks before publishing any piece that names or shows a person.
+8. **Configure the human-gate policy.** `gated` status means the piece sits in the store until the operator manually flips it to `scheduled`. Defaults:
    * First piece of a new arc → gated.
    * Any piece featuring a real human cameo (other than the operator) → gated.
    * Any piece touching a sensitive topic flagged in the brand voice rules → gated.
    * Routine pieces in an established arc → auto-schedule.
 
-8. **Run the full doctor.** Once arcs, canonical store, and per-channel Setup are all done, run `scripts/setup-doctor.sh` (no `--channel` flag — probes all five). Exit 0 + `✓` on every line = the pipeline is fully wired and Commands 2-7 below can run without operator intervention. The doctor's JSON mode (`--json`) is what the bundled MCP `pipeline-state` tool surfaces to a mentee agent on first connect.
+9. **Run the full doctor.** Once arcs, canonical store, and per-channel Setup are all done, run `scripts/setup-doctor.sh` (no `--channel` flag — probes all five). Exit 0 + `✓` on every line = the pipeline is fully wired and Commands 2-7 below can run without operator intervention. The doctor's JSON mode (`--json`) is what the bundled MCP `pipeline-state` tool surfaces to a mentee agent on first connect.
 
 Operator confirms: "Setup complete."
 
