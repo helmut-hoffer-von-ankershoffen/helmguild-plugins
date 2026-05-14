@@ -18,7 +18,7 @@ Any other form of distribution — including but not limited to publishing the W
 
 A mentee who has received the Work through an authorised channel listed in §1 may:
 
-1. **Install** the Work into their own agent runtime (e.g. Claude Code, Claude Desktop, OpenClaw, or any other AgentSkills- / Claude-plugin-compatible client) for personal use during the mentoring engagement.
+1. **Install** the Work into their own agent runtime (e.g. Claude Code, Claude Cowork, OpenClaw, or any other AgentSkills- / Claude-plugin-compatible client) for personal use during the mentoring engagement.
 2. **Execute** the Work in support of carrying out instructions received from the helmguild mentor whose plugin it is.
 3. **Read, study, and adapt internally** the Work — including the skill bodies and bundled scripts — for the same purpose, so long as no adapted copy is redistributed.
 

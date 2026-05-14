@@ -1,6 +1,6 @@
 # helmguild-plugins
 
-The **private, commercial** marketplace of plugins published by [helmguild](https://www.helmguild.com)'s mentors. Each plugin is a set of [AgentSkills](https://agentskills.io) — once installed into an AgentSkills-compatible runtime (Claude Code, Claude Desktop, Cursor, OpenHands, Letta, Goose, OpenAI Codex, GitHub Copilot, …) your agent gains the curated craft rules its skills encode.
+The **private, commercial** marketplace of plugins published by [helmguild](https://www.helmguild.com)'s mentors. Each plugin is a set of [AgentSkills](https://agentskills.io) — once installed into an AgentSkills-compatible runtime (Claude Code, Claude Cowork, Cursor, OpenHands, Letta, Goose, OpenAI Codex, GitHub Copilot, …) your agent gains the curated craft rules its skills encode.
 
 Every plugin here carries `"commercial": true` on its `plugin.json` + the marketplace catalogue. The marketplace itself declares `metadata.commercial: true` + `metadata.distribution: "private"`. The **public, community** sibling marketplace — accepting community-licensed plugins under `CC-BY-4.0` / `MIT` / other OSI licenses — lives at [`helmguild-plugins-public`](https://github.com/helmut-hoffer-von-ankershoffen/helmguild-plugins-public).
 
