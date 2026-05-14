@@ -1,0 +1,19 @@
+{
+  "name": "pepe-operator-craft",
+  "description": "The day-to-day discipline of operating an agentic assistant — terse responses, bilingual defaults, push-back, compartmentalisation between the humans served. The craft rules every operator-grade agent absorbs.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Helmut Hoffer von Ankershoffen",
+    "email": "helmuthva@gmail.com"
+  },
+  "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
+  "repository": "https://github.com/helmut-hoffer-von-ankershoffen/helmguild-plugins",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "ammp",
+    "agentskills",
+    "mentoring",
+    "pepe-arturo",
+    "operator-craft"
+  ]
+}

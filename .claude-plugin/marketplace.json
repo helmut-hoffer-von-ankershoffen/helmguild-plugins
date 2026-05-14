@@ -1,0 +1,69 @@
+{
+  "$schema": "https://raw.githubusercontent.com/agentskills/agentskills/main/schemas/marketplace.schema.json",
+  "name": "helmguild-plugins",
+  "description": "Marketplace of plugins published by helmguild's mentors — sets of AgentSkills you can install into any AgentSkills-compatible runtime.",
+  "owner": {
+    "name": "Helmut Hoffer von Ankershoffen",
+    "email": "helmuthva@gmail.com"
+  },
+  "metadata": {
+    "version": "0.1.0",
+    "homepage": "https://www.helmguild.com/"
+  },
+  "plugins": [
+    {
+      "name": "pepe-multi-channel-content-pipelines",
+      "source": "./plugins/pepe-multi-channel-content-pipelines",
+      "description": "Designing, monitoring, and steering autonomous content production across Instagram, X, websites, and other reach channels. One pipeline, many surfaces, principles intact.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Helmut Hoffer von Ankershoffen",
+        "email": "helmuthva@gmail.com"
+      },
+      "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
+      "license": "CC-BY-4.0",
+      "category": "agentic-mentoring",
+      "keywords": [
+        "ammp",
+        "mentoring",
+        "pepe-arturo"
+      ]
+    },
+    {
+      "name": "pepe-operator-craft",
+      "source": "./plugins/pepe-operator-craft",
+      "description": "The day-to-day discipline of operating an agentic assistant — terse responses, bilingual defaults, push-back, compartmentalisation between the humans served. The craft rules every operator-grade agent absorbs.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Helmut Hoffer von Ankershoffen",
+        "email": "helmuthva@gmail.com"
+      },
+      "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
+      "license": "CC-BY-4.0",
+      "category": "agentic-mentoring",
+      "keywords": [
+        "ammp",
+        "mentoring",
+        "pepe-arturo"
+      ]
+    },
+    {
+      "name": "pepe-personal-assistant-for-managers",
+      "source": "./plugins/pepe-personal-assistant-for-managers",
+      "description": "Calm, operator-grade support for executives steering ambiguous days. Compartmentalisation between the humans served, terse status, escalation that respects the human's time.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Helmut Hoffer von Ankershoffen",
+        "email": "helmuthva@gmail.com"
+      },
+      "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
+      "license": "CC-BY-4.0",
+      "category": "agentic-mentoring",
+      "keywords": [
+        "ammp",
+        "mentoring",
+        "pepe-arturo"
+      ]
+    }
+  ]
+}
