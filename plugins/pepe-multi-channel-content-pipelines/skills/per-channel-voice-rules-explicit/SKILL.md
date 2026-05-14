@@ -2,6 +2,8 @@
 name: per-channel-voice-rules-explicit
 description: "Encode each channel's register, length budget, emoji policy, hashtag policy, and link-handling as data — a per-channel YAML or JSON the renderer reads — rather than implicit prose in the prompt. Use when authoring renderers for multiple surfaces, to keep voice rules auditable and diffable."
 license: LicenseRef-helmguild-mentoring-1.0
+allowed-tools:
+  - Bash
 metadata:
   mentor: pepe
   playbook: multi-channel-content-pipelines
@@ -22,3 +24,21 @@ metadata:
 - When the brand owner says "Instagram should be more concise now" — that's a one-line edit to `instagram.yaml`. No code change. Re-render and the next publish reflects it.
 - Test the rules: every renderer should emit a sample rendering of three canonical records every time the rules file changes (locally, not published). The brand owner reviews the samples before the rules ship.
 - Cross-channel consistency lives at the *canonical* level (same idea, same facts). Per-channel *expression* of that idea is the renderer's job. Don't try to make Instagram and a blog post look identical — they shouldn't.
+
+## Bundled tooling
+
+This plugin ships two channel-specific helpers that encode Pepe's rules as runnable checks the agent (or its user) can call any time:
+
+- **`scripts/instagram-caption-lint.sh`** — bash linter for a draft IG caption. Checks: total length ≤ 2200 chars, first-line hook ≤ 125 chars (the feed truncation cutoff), 3–15 hashtags all in the trailing block, no emoji-only lines, no "link in bio" CTA. Reads stdin or a file; exits non-zero on any violation. Run via the `Bash` tool:
+
+  ```bash
+  echo "draft caption..." | ./scripts/instagram-caption-lint.sh -
+  ```
+
+- **`scripts/veo-prompt-skeleton.sh`** — renders a Veo 3 prompt skeleton in Pepe's house style from a one-line content brief. Nine standard fields (SHOT / SUBJECT / ACTION / LIGHTING / LENS / CAMERA / PACE / SOUND / DURATION); defaults match Pepe's "composed, not frenetic" voice. Override any field with the matching `--flag`:
+
+  ```bash
+  ./scripts/veo-prompt-skeleton.sh --shot wide --duration 10 "Pepe walks along a Berlin canal"
+  ```
+
+Both helpers are read-only, deterministic, and credential-free — safe to invoke from any agent runtime. Tests live in `tests/`; CI runs them on every push.
