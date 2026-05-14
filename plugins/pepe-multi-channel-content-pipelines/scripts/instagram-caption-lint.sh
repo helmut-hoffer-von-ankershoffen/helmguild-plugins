@@ -3,7 +3,7 @@
 # Pepe's per-channel voice rules. Read-only; no API calls.
 #
 # Pepe's per-channel rules for Instagram (encoded as static lint
-# checks below; the playbook skill `per-channel-voice-rules-explicit`
+# checks below; the playbook skill `publishing-instagram (Command 5)`
 # is the normative source):
 #
 #   - First line: hook (<= 125 chars; truncation rule of the feed).

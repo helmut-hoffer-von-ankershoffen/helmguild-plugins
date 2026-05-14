@@ -3,7 +3,7 @@
 # one-line content brief. Read-only; deterministic; no API calls.
 #
 # Pepe's house style for Veo prompts (per the
-# `per-channel-voice-rules-explicit` skill in this plugin):
+# `content-strategy-planning-optimization` skill in this plugin):
 #
 #   - SHOT — single, declared (medium / close-up / wide / overhead).
 #   - SUBJECT — what's on screen, one clause.
