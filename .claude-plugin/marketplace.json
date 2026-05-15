@@ -67,25 +67,6 @@
         "mentoring",
         "pepe-arturo"
       ]
-    },
-    {
-      "name": "pepe-knowledge-management",
-      "source": "./plugins/pepe-knowledge-management",
-      "description": "Agent + human knowledge management: the shared canonical Markdown vault every other playbook depends on, per-agent auto-memory discipline, daily learning extraction from chat history, cross-agent shared memory when a human operates multiple isolated agents, quarterly vault coherence + drift audit. Sibling to pepe-multi-channel-content-pipelines.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Helmut Hoffer von Ankershoffen",
-        "email": "helmuthva@gmail.com"
-      },
-      "homepage": "https://www.helmguild.com/pepe-arturo-ai/",
-      "license": "LicenseRef-helmguild-mentoring-1.0",
-      "category": "agentic-mentoring",
-      "keywords": [
-        "ammp",
-        "mentoring",
-        "pepe-arturo",
-        "knowledge-management"
-      ]
     }
   ]
 }
