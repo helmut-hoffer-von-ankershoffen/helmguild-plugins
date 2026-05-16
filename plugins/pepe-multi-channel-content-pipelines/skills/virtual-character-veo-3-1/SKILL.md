@@ -138,7 +138,13 @@ Veo rejects prompts containing certain content (literal brand names embroidered 
 
 9. **Reference-image aspect prep — match the canvas aspect.** Veo respects the reference image's framing more strongly than the prompt's stated aspect ratio. A square (1024×1024) avatar fed into a 9:16 generation request causes Veo to centre the action in a square sub-rectangle. **Preprocess the avatar to the target aspect** before passing as `image=...`: for 9:16 output, resize/extend the avatar to 720×1280 with the character's face in the upper-third and content filling the rest. Pepe's reels are full 720×1280 content; Claudine's were not — same SDK, same model — the only material difference is the avatar reference image preparation. (Hypothesis confirmed by behavioural pattern; full A/B test pending the next persona build.)
 
-10. **UTF-8 source-file declaration on the host share.** Every Python script that writes to `/Volumes/My Shared Files/...` and contains non-ASCII characters in string literals MUST start with `# -*- coding: utf-8 -*-`. macOS-default Python 3.9 has stricter encoding detection on volume-mounted paths and will reject em-dashes (`—` = `\xe2\x80\x94`) in source literals even when the file is otherwise valid UTF-8. Keep ASCII hyphens (`-`) in framing-hint string literals; reserve typographic em-dashes for the descriptive scene prose where the model benefits from precision (and the parser has already accepted the file).
+10. **Voiceover-vs-visual reconciliation before every submission.** When iterating on a prompt across multiple patches (RAI-soften, swap subject, add framing hint), it is easy to overwrite an earlier fix by re-running a template-based regenerate. Symptom: the visual prose describes Subject A while the spoken voiceover line still names Subject B — Veo dutifully renders both, and the audience hears the mismatch on the first play. Grep the final source before submitting:
+    ```bash
+    grep -E "gets (it|that)|watch (her|him)|<subject-name>" submit.py
+    ```
+    If the spoken line names a different subject than the visual prose describes, the patch chain has regressed. Fix before burning quota.
+
+11. **UTF-8 source-file declaration on the host share.** Every Python script that writes to `/Volumes/My Shared Files/...` and contains non-ASCII characters in string literals MUST start with `# -*- coding: utf-8 -*-`. macOS-default Python 3.9 has stricter encoding detection on volume-mounted paths and will reject em-dashes (`—` = `\xe2\x80\x94`) in source literals even when the file is otherwise valid UTF-8. Keep ASCII hyphens (`-`) in framing-hint string literals; reserve typographic em-dashes for the descriptive scene prose where the model benefits from precision (and the parser has already accepted the file).
 
 ### Command 6 — Batch + quota management
 
