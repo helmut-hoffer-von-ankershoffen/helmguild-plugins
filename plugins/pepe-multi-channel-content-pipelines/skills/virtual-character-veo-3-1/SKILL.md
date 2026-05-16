@@ -110,6 +110,7 @@ Veo outputs are **content-blind from the agent's perspective**, so validate befo
 2. **Visual consistency check.** Sample 4 frames evenly across the 8 s (`ffmpeg -ss <t> -i raw.mp4 -frames:v 1 frame-<i>.png`). For the agent, open each frame and confirm the character matches the reference sheet: face shape, outfit, posture. For a real-person co-star, confirm no morphing.
 3. **Audio check.** If the prompt requested dialogue, run `ffprobe -v error -select_streams a -show_entries stream=codec_name,duration raw.mp4` — must show an audio stream with ≈ 8 s duration. Missing audio means Veo's audio safety filter likely tripped on the dialogue text (see Command 5).
 4. **RAI filter post-check.** If the request returned an HTTP 200 but the video has no audio, no character, or a black-screen segment, that's a **silent safety rejection** — Veo doesn't always surface filter trips as an error. Soft-fail: log the prompt, soften it, retry.
+5. **Per-frame letterbox / pillarbox check (poster selection).** Veo encodes at the requested aspect ratio (e.g. 720×1280 for 9:16) but *individual frames inside the clip can carry transient pillar- or letter-boxing* — Veo's content area can sit inside the requested raster with black bars on the sides or top/bottom at specific moments, even though `cropdetect` over the whole 8 s sees full coverage. When extracting a still poster (`-ss <t>`), scan multiple timestamps (t=1, 4, 6, 7s) and pick a frame where content reaches all four edges. The t=4s default lands on a letter-boxed moment surprisingly often.
 
 ### Command 5 — Handle Veo's RAI safety filter
 
@@ -118,7 +119,10 @@ Veo rejects prompts containing certain content (literal brand names embroidered 
 1. **Strip literal brand names.** Replace embroidered "Nike", "Canyon", "Orca", etc. with generic descriptors ("a black running cap", "a black aero helmet"). Visual fidelity stays — only the literal text trips the filter.
 2. **Avoid real-person + risky-action pairs.** If using a real co-star's face, keep the scene tone calm and non-violent. Sports cameos (running, swimming, biking) work fine; "lifting a heavy object alone" or "near a cliff edge" can trip.
 3. **Soften dialogue.** Strong language, political assertions, named third parties — soften or paraphrase. The visual prompt can stay strong; the dialogue text is what the filter scans most aggressively.
-4. **Retry with the softened prompt.** Two strikes on the same shot = move on, generate a different shot to fill the slot in the content calendar. Don't burn quota wrestling one prompt.
+4. **Keep proper names out of the spoken voiceover.** Even friendly first names ("Mia gets that — watch her run") can trip the filter as "real people's names or likenesses." The voiceover scanner is stricter than the visual-description scanner — names are fine in the prompt's scene-description prose, just not in the line the character speaks. Substitute generic noun + pronoun: *"The pup gets it — watch her run."*
+5. **Watch for brand-name density.** A single brand name in a sentence ("Canyon Aeroad road racing bike") usually passes; two or three in one breath ("Specialized Evade / Giro Eclipse silhouette") cumulatively raises the trip rate, especially when combined with proper noun co-stars. Cap at one brand mention per scene; otherwise paraphrase ("matte black aero road helmet").
+6. **Symptom signature in the new SDK.** When using `google-genai`'s `client.models.generate_videos(...)`, an RAI rejection returns the operation with `done=True`, `op.response.generated_videos=None`, and `op.response.rai_media_filtered_count=1` with `rai_media_filtered_reasons` listing the trigger phrase. Don't treat it as a transient error — re-prompt and retry once with the offending phrase neutralised.
+7. **Retry with the softened prompt.** Two strikes on the same shot = move on, generate a different shot to fill the slot in the content calendar. Don't burn quota wrestling one prompt.
 
 ### Command 6 — Batch + quota management
 
@@ -128,6 +132,39 @@ For a content calendar that ships >1 shot per week, run Command 3 in batched swe
 2. **Cap parallelism.** ≤ 3 in-flight long-running operations on the free preview tier. Going wider raises 429 rate but doesn't speed up wall-clock.
 3. **Make every submission resumable.** Persist the long-running operation name to a state file (`state/veo-queue/<id>.op`) the moment the API returns it. If the agent crashes mid-poll, the next run reads the state file and resumes polling — never re-submits and never loses the result.
 4. **Cost-of-fail discipline.** A failed shot is ~30-60 s of wall-clock + one quota unit. Budget that into the calendar. Aim for ≥ 80 % first-shot success once Command 2 (reference sheet) is stable.
+
+### Command 7 — Reuse a generated reel as a profile-page talking-head portrait
+
+When a virtual character also has a public profile page (e.g. `helmguild.com/<persona>/`), the convention is to embed a small (180×180 desktop, 150×150 mobile) circular autoplaying loop above the H1. Source it from one of the persona's existing 9:16 reels — don't burn a separate Veo generation just for the portrait.
+
+1. **Pick the source reel.** Default to the first reel of the persona's first arc (the canonical "first impression"). Pick a reel where the character is facing camera for most of the 8 seconds.
+2. **Center-crop 9:16 → 1:1.** Use `ffmpeg -y -i <source.mp4> -vf "crop=720:720:0:<y_offset>" -c:v libx264 -preset slow -crf 22 -c:a aac -b:a 96k <persona>-talking.mp4`. Tune `<y_offset>` so the character's face sits in the center of the 720×720 square — 300 is a common starting value for sources where the face is in the upper half of the 9:16 frame.
+3. **Verify by spot-check.** Extract one frame from the cropped output (`-ss 5 -vframes 1`) and confirm the face is centred and the crop didn't cut the head off.
+4. **Place under `assets/`.** Naming convention: `<persona>-talking.mp4` (e.g. `claudine-talking.mp4`) so the markup template stays consistent across personas.
+
+### Command 8 — Embed the autoplay portrait + audio toggle on the persona page
+
+The portrait UX pattern is identical across personas. Browsers globally block audible autoplay before the first user gesture, so the markup ships muted + listens for any interaction to flip muted=false on the very first one.
+
+Required markup (HTML), inline `<style>`, and `<script>` blocks live in the live profile pages — copy from an existing one (e.g. `helmguild.com/pepe-arturo-ai/index.html` or `helmguild.com/claudine-reyes/index.html`). Key parts of the pattern:
+
+1. **`<video>` element:** `autoplay muted loop playsinline poster="<persona>/assets/avatar.png"` + `<source src="<persona>/assets/<persona>-talking.mp4">` + an `<img>` fallback inside the `<video>` for browsers that can't play it.
+2. **`<button class="portrait-unmute">`** absolutely positioned bottom-right of the portrait shell, with two SVG icons (muted speaker / on speaker) swapped by hidden attribute.
+3. **Inline `<style>`** for `.portrait-shell`, `.portrait`, `.portrait-unmute` (size + circular shape + pulsing-ring keyframes). **The keyframe name is persona-scoped** (`<persona>-unmute-pulse`) so two personas embedded on the same page would not clash.
+4. **`<script>` at end of `<body>`**: try optimistic `v.play()` with sound; if it rejects, fall back to muted + listen for `click|touchstart|keydown|pointerdown` on `document` (capture + passive). First gesture flips muted=false and restarts at `currentTime = 0`. The speaker button is a redundant explicit affordance and uses the same handler path.
+5. **Element IDs:** `<persona>-portrait` + `<persona>-unmute`. Never reuse Pepe's `pepe-*` IDs on Claudine's page or vice versa — they'd collide if a future page embedded both.
+
+This pattern works in Safari (desktop + iOS), Chrome, Firefox, Edge. The pulsing ring on the button hints audio is available without demanding the user find a specific control.
+
+### Command 9 — Pick a clean poster for the reels-grid embed
+
+When embedding the same generated reel into a website reels-grid (per the publishing-blog pattern), don't reuse the t=4s frame as the poster blindly — that's a common landing point for transient pillar/letterbox bars inside Veo's output (see Command 4 §5). Procedure:
+
+1. Extract all 8 one-second frames (`-vf fps=1`).
+2. Open each, pick the one where Veo's content fills all four edges of the 720×1280 raster.
+3. Encode as JPEG (`-q:v 4 -f mjpeg`) for the `<persona>/reels/<NNN>-poster.jpg` filename the grid expects.
+
+The poster only governs the still-image preview before play. The video stream may still have transient boxing during playback; if that's intolerable, the only deterministic fix is a re-generation with a different scene framing prompt, or an ffmpeg `crop=...:...` post-pass.
 
 ## Pepe Arturo reference deployment
 
