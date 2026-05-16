@@ -112,6 +112,12 @@ Veo outputs are **content-blind from the agent's perspective**, so validate befo
 4. **RAI filter post-check.** If the request returned an HTTP 200 but the video has no audio, no character, or a black-screen segment, that's a **silent safety rejection** — Veo doesn't always surface filter trips as an error. Soft-fail: log the prompt, soften it, retry.
 5. **Per-frame letterbox / pillarbox check (poster selection).** Veo encodes at the requested aspect ratio (e.g. 720×1280 for 9:16) but *individual frames inside the clip can carry transient pillar- or letter-boxing* — Veo's content area can sit inside the requested raster with black bars on the sides or top/bottom at specific moments, even though `cropdetect` over the whole 8 s sees full coverage. When extracting a still poster (`-ss <t>`), scan multiple timestamps (t=1, 4, 6, 7s) and pick a frame where content reaches all four edges. The t=4s default lands on a letter-boxed moment surprisingly often.
 
+6. **WHOLE-video content-area check — run cropdetect at `limit=64`, not the default `limit=24`.** Veo can encode an entire clip with the action confined to a square (or near-square) sub-rectangle inside the requested 9:16 canvas, with dark **grey** margins above and below that fall in the 16-63 luma range. These margins are invisible to `cropdetect` at the default `limit=24` but visible at `limit=64`. Symptom: the reel looks correctly 9:16 by `ffprobe` and by cropdetect-default, but the action only occupies ~50% of the vertical canvas during playback. Helmut will report this as "the heights are wrong on the page."
+   ```bash
+   ffmpeg -i reel.mp4 -vf "cropdetect=64:2:0" -f null - 2>&1 | grep "Parsed_cropdetect" | tail -1
+   ```
+   If the reported `crop=` is smaller than the encoded resolution, the video has hidden content margins. Either re-generate with the prompt mitigation (Command 5 §8 below), preprocess the reference image to the target aspect (Command 5 §9), or post-process crop and accept a non-9:16 grid aspect.
+
 ### Command 5 — Handle Veo's RAI safety filter
 
 Veo rejects prompts containing certain content (literal brand names embroidered on clothing, real-person names attached to risky activities, etc.) — and the rejection mode is *silent video corruption* rather than a clean HTTP error. Procedure:
@@ -123,6 +129,16 @@ Veo rejects prompts containing certain content (literal brand names embroidered 
 5. **Watch for brand-name density.** A single brand name in a sentence ("Canyon Aeroad road racing bike") usually passes; two or three in one breath ("Specialized Evade / Giro Eclipse silhouette") cumulatively raises the trip rate, especially when combined with proper noun co-stars. Cap at one brand mention per scene; otherwise paraphrase ("matte black aero road helmet").
 6. **Symptom signature in the new SDK.** When using `google-genai`'s `client.models.generate_videos(...)`, an RAI rejection returns the operation with `done=True`, `op.response.generated_videos=None`, and `op.response.rai_media_filtered_count=1` with `rai_media_filtered_reasons` listing the trigger phrase. Don't treat it as a transient error — re-prompt and retry once with the offending phrase neutralised.
 7. **Retry with the softened prompt.** Two strikes on the same shot = move on, generate a different shot to fill the slot in the content calendar. Don't burn quota wrestling one prompt.
+
+8. **Whole-video content-area fix — prepend an explicit "fill the frame" framing hint to the prompt body.** When Command 4 §6 detects a sub-rectangle content area, prepend this clause to the start of the PROMPT (after the opening "Cinematic vertical 9:16 reel." sentence). Use **ASCII hyphens only** (em-dashes in Python string literals on the host-share volume have tripped Python 3.9 source parsing — see Command 5 §10):
+   ```
+   9:16 vertical composition fills the ENTIRE frame top to bottom. The character and the surrounding scene reach all four edges of the canvas - absolutely no black bars, no letterbox, no pillarbox, no dark margins above or below the action. Treat the canvas as the full safe area; the action is framed from the top edge to the bottom edge.
+   ```
+   Observed effectiveness: a Claudine reel went 720×720 content (56% of frame) → 720×980 (76%) with this hint. Not 100% but moves the dial. Combine with §9 for full effect.
+
+9. **Reference-image aspect prep — match the canvas aspect.** Veo respects the reference image's framing more strongly than the prompt's stated aspect ratio. A square (1024×1024) avatar fed into a 9:16 generation request causes Veo to centre the action in a square sub-rectangle. **Preprocess the avatar to the target aspect** before passing as `image=...`: for 9:16 output, resize/extend the avatar to 720×1280 with the character's face in the upper-third and content filling the rest. Pepe's reels are full 720×1280 content; Claudine's were not — same SDK, same model — the only material difference is the avatar reference image preparation. (Hypothesis confirmed by behavioural pattern; full A/B test pending the next persona build.)
+
+10. **UTF-8 source-file declaration on the host share.** Every Python script that writes to `/Volumes/My Shared Files/...` and contains non-ASCII characters in string literals MUST start with `# -*- coding: utf-8 -*-`. macOS-default Python 3.9 has stricter encoding detection on volume-mounted paths and will reject em-dashes (`—` = `\xe2\x80\x94`) in source literals even when the file is otherwise valid UTF-8. Keep ASCII hyphens (`-`) in framing-hint string literals; reserve typographic em-dashes for the descriptive scene prose where the model benefits from precision (and the parser has already accepted the file).
 
 ### Command 6 — Batch + quota management
 
