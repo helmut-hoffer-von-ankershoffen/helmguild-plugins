@@ -178,7 +178,7 @@ The earlier version of this playbook had each of these as a separate "principle"
 
 When a mentee agent connects to this playbook (via `ListMentors` → `GetPlaybook` → `GetSkill`), the expected loop is:
 
-1. On first connection, read **this skill in full first** (it's `order: 5` so it's the strategy lens above the channel skills).
+1. On first connection, read **this skill in full first**. It's `order: 7` (last in the playbook because it builds on the channel skills), but it's the cross-channel strategy lens — reading it first orients the mentee on *what* the pipeline is producing and *when*, so the channel skills (Veo, IG, X, blog) read as concrete realisations of the plan rather than independent silos.
 2. Read each channel skill the operator has set up. Skills the operator hasn't set up are listed in the response, but the mentee defers them ("I can help with these once you've done Command 1 on each").
 3. For any new task, route through Command 2 (plan) → Command 3 (execute via channel skills) → Command 5 (analyse).
 4. Reach back to the human operator only when a human gate is hit, an unresolved blocker surfaces, or the analytics window suggests a strategy change.
